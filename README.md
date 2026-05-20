@@ -99,6 +99,16 @@ khukra-run physical turbomachinery_degradation turbomachinery_health_forecast
 | `KHUKRA_ADMIN_EMAIL` | admin@khukra.local | Bootstrap admin |
 | `KHUKRA_ADMIN_PASSWORD` | khukra-admin | Bootstrap password |
 
+## Planning & todos
+
+| Doc | Purpose |
+|-----|---------|
+| [docs/roadmap.md](docs/roadmap.md) | Phases: deployment → hardening → features |
+| [docs/deployment-plan.md](docs/deployment-plan.md) | Go-live checklist and env vars |
+| [GitHub Issues](https://github.com/Claymorrr/khukra/issues) | Actionable tasks (label: `deployment`, `feature`, …) |
+
+Use a [GitHub Project](https://github.com/Claymorrr/khukra/projects) board for Backlog / In progress / Done.
+
 ## Project layout
 
 ```
