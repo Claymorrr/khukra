@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "khukra"
+version = "0.3.0"
+description = "Khukra — inference and data engineering platform"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pandas>=2.1",
+    "duckdb>=0.10",
+    "pyarrow>=14.0",
+    "streamlit>=1.30",
+    "matplotlib>=3.8",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "pydantic>=2.6",
+    "python-jose[cryptography]>=3.3",
+    "bcrypt>=4.1",
+    "python-multipart>=0.0.9",
+]
+
+[project.scripts]
+khukra-run = "khukra.cli:main"
+khukra-api = "khukra.api.main:run"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -15,11 +15,17 @@ __pycache__/
 venv/
 .env
 *.egg-info/
+.pytest_cache/
 dist/
 build/
 
 # Node
 node_modules/
+frontend/.next/
+frontend/out/
+
+# Python API / frontend
+.venv/
 npm-debug.log*
 .yarn/
 
@@ -30,3 +36,12 @@ npm-debug.log*
 
 # Cursor
 terminals/
+
+# Khukra data artifacts
+data/artifacts/
+data/runs/
+data/synthetic/
+data/warehouse/
+data/datasets/
+data/exports/
+!data/.gitkeep
