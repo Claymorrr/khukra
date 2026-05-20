@@ -40,7 +40,7 @@
 ## Setup
 
 ```powershell
-cd C:\Users\ahmed\my-project
+cd C:\Users\ahmed\khukra
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -e .
