@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { getPlatformSummary, getVersioningSummary, type PlatformSummary } from "@/lib/api";
 import type { VersioningSummary } from "@/lib/types";
+import { normalizeDomainManifest } from "@/lib/domainManifest";
 import type { DomainInfo } from "@/lib/types";
 import type { DomainModule } from "./types";
 import { DOMAIN_MODULES } from "./types";
@@ -55,7 +56,7 @@ export function DomainOverview({
   }, []);
 
   const modelCount = domain.subdomains.reduce((n, s) => n + s.models.length, 0);
-  const manifest = domain.manifest;
+  const manifest = normalizeDomainManifest(domain.id, domain.manifest);
 
   if (loading) {
     return (

@@ -37,6 +37,7 @@ import { DevOpsPanel, InfraOpsPanel } from "../platform/OpsReadinessPanel";
 import { PlatformMLOpsPanel } from "../platform/PlatformMLOpsPanel";
 import { DomainOverview } from "./DomainOverview";
 import { DomainSidebar } from "./DomainSidebar";
+import { normalizeDomainManifest } from "@/lib/domainManifest";
 import { DOMAIN_MODULES, type DomainModule } from "./types";
 
 const DOMAIN_NAV_ICONS: Record<string, typeof Box> = {
@@ -204,11 +205,13 @@ export function DomainShell({
   }
 
   const accent = ctx.domain.color;
+  const manifest = normalizeDomainManifest(ctx.domain.id, ctx.domain.manifest);
+  const moduleOrder = manifest.module_order;
   const orderedModules = [
-    ...ctx.domain.manifest.module_order
+    ...moduleOrder
       .map((id) => DOMAIN_MODULES.find((mod) => mod.id === id))
       .filter((mod): mod is (typeof DOMAIN_MODULES)[number] => Boolean(mod)),
-    ...DOMAIN_MODULES.filter((mod) => !ctx.domain.manifest.module_order.includes(mod.id)),
+    ...DOMAIN_MODULES.filter((mod) => !moduleOrder.includes(mod.id)),
   ];
   const ActivePlatformPanel = PLATFORM_PANELS[moduleFromUrl];
   const showScenarioControls = ![

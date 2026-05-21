@@ -49,7 +49,7 @@ export interface DomainInfo {
   id: string;
   label: string;
   color: string;
-  manifest: DomainManifestInfo;
+  manifest?: DomainManifestInfo | null;
   subdomains: SubdomainInfo[];
 }
 

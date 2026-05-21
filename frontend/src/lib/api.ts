@@ -1,4 +1,5 @@
 import { getStoredToken } from "./auth";
+import { normalizeDomain } from "./domainManifest";
 import type {
   CatalogResponse,
   ComparisonResponse,
@@ -43,7 +44,10 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function getCatalog(): Promise<CatalogResponse> {
-  return fetchJson("/catalog");
+  return fetchJson<CatalogResponse>("/catalog").then((data) => ({
+    ...data,
+    domains: data.domains.map(normalizeDomain),
+  }));
 }
 
 export function getVersioningSummary(): Promise<VersioningSummary> {
