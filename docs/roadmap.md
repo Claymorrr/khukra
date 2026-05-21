@@ -54,19 +54,19 @@ Priority domains:
 - **Physical Systems**: advanced Aerodesign operating environment
 - **Finance**: Quant Trading research and operations environment
 
-## Versioning architecture (done — #28)
+## Versioning architecture (foundation shipped — #28 open)
 
-See [versioning.md](./versioning.md) for entity IDs, version labels, lineage metadata, and compatibility policy.
+See [versioning.md](./versioning.md) for the current entity registry, manifest/model/dataset version labels, lineage metadata, and compatibility policy. #28 remains open because pipeline templates/runs, evaluation artifacts, analytics queries, reports/exports, app/API releases, and ingested datasets still need first-class version coverage.
 
-## Integrated operations (done — #24)
+## Integrated operations (foundation shipped — #24 open)
 
-InfraOps, DevOps, and MLOps are exposed inside domain workspaces rather than only as generic platform concepts:
+InfraOps, DevOps, and MLOps now have domain workspace surfaces instead of existing only as generic platform concepts:
 
 - **InfraOps**: warehouse, storage, runtime, and service readiness signals
 - **DevOps**: manifest/version release gates, environment contract, and job health
 - **MLOps**: pipeline templates, model registry, evaluations, lineage, and promotion readiness
 
-Physical and Finance declare the full ops set and show domain-specific readiness from `/api/platform/ops/summary`.
+Physical and Finance declare the full ops set and show domain-specific readiness from `/api/platform/ops/summary`. #24 remains open until DevOps is backed by real CI/build/deploy health, environment validation, and release checks.
 
 ---
 
