@@ -16,7 +16,7 @@ import {
 import { getCatalog } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { DomainInfo } from "@/lib/types";
-import { domainPath } from "./domain/types";
+import { zonePath } from "@/lib/api/v1";
 
 const DOMAIN_ICONS: Record<string, typeof Box> = {
   physical: Box,
@@ -56,7 +56,7 @@ export function WorkspaceGate() {
             </div>
             <div>
               <p className="text-sm font-semibold tracking-wide">Khukra</p>
-              <p className="text-[11px] uppercase tracking-[0.24em] text-zinc-600">Domain OS</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-zinc-600">Data Product OS</p>
             </div>
           </div>
           <button
@@ -71,14 +71,14 @@ export function WorkspaceGate() {
 
         <main className="flex flex-1 flex-col justify-center py-12">
           <section className="mb-10 max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.32em] text-zinc-600">Select domain</p>
+            <p className="text-xs uppercase tracking-[0.32em] text-zinc-600">Knowledge lakehouse</p>
             <h1 className="mt-4 text-5xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
-              Work by domain.
+              Governed data products, domain views.
             </h1>
             <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-zinc-600">
               {user && <span>{user.display_name}</span>}
               <span className="h-1 w-1 rounded-full bg-zinc-700" />
-              <span>Inference · Data · MLOps · Analytics</span>
+              <span>Data Hub · Knowledge · Pipelines · Models</span>
             </div>
           </section>
 
@@ -103,7 +103,7 @@ export function WorkspaceGate() {
                   <button
                     key={domain.id}
                     type="button"
-                    onClick={() => router.push(domainPath(domain.id, "overview"))}
+                    onClick={() => router.push(zonePath(domain.id, "data"))}
                     className="group relative min-h-72 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 text-left shadow-2xl shadow-black/20 transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.06]"
                   >
                     <div

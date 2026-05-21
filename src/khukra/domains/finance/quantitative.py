@@ -59,3 +59,45 @@ RiskExecutionResearch = make_research_model(
     },
     {"history_length": 390, "forecast_horizon": 16},
 )
+
+AlphaSignalDecay = make_research_model(
+    "finance",
+    "statistical_arbitrage",
+    "alpha_signal_decay_forecast",
+    lambda n, rng, p: {
+        "target": np.clip(
+            ar_process(n, 0.9, 0.05, rng)
+            * np.exp(-np.linspace(0, 0.8, n))
+            + 0.15 * jump_diffusion(n, 0.0, 0.02, 0.02, 0.0, 0.2, rng),
+            -1.5,
+            1.5,
+        ),
+        "half_life_proxy": np.clip(
+            5 + 3 * ar_process(n, 0.85, 0.1, rng) + compound_poisson_shocks(n, 0.01, 1.5, 0.2, rng),
+            1,
+            20,
+        ),
+    },
+    {"history_length": 360, "forecast_horizon": 20},
+)
+
+DrawdownRiskEnvelope = make_research_model(
+    "finance",
+    "risk_and_execution_research",
+    "drawdown_risk_envelope_forecast",
+    lambda n, rng, p: {
+        "target": np.clip(
+            shock_process(n, 0.2, 0.05, 0.15, rng)
+            + 0.25 * stochastic_volatility(n, 0.04, 0.12, 0.2, rng)
+            + 0.1 * regime_switch_series(n, (0.05, 0.35), (0.02, 0.06), 0.04, rng)[0],
+            0,
+            2,
+        ),
+        "max_drawdown_proxy": np.clip(
+            np.maximum.accumulate(ar_process(n, 0.8, 0.07, rng)) * -0.15 + 0.2,
+            0.02,
+            0.5,
+        ),
+    },
+    {"history_length": 420, "forecast_horizon": 18},
+)

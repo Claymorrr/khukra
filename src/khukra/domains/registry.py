@@ -4,6 +4,8 @@ from khukra.domains.computing.systems import (
     MLAcceleratorWorkloads,
 )
 from khukra.domains.finance.quantitative import (
+    AlphaSignalDecay,
+    DrawdownRiskEnvelope,
     MarketMicrostructure,
     RiskExecutionResearch,
     StatisticalArbitrage,
@@ -13,7 +15,11 @@ from khukra.domains.intelligence.research import (
     InfluenceDynamics,
     SignalFusion,
 )
-from khukra.domains.physical.aerodesign import AerodesignPerformance
+from khukra.domains.physical.aerodesign import (
+    AerodesignMissionRange,
+    AerodesignPerformance,
+    AerodesignStaticMargin,
+)
 from khukra.domains.physical.propulsion import (
     CombustionStability,
     HybridPropulsionControl,
@@ -58,6 +64,8 @@ DOMAINS: dict[str, dict[str, dict[str, type]]] = {
     "physical": {
         "aerodesign": {
             "aerodynamic_performance_forecast": AerodesignPerformance,
+            "static_margin_stability_forecast": AerodesignStaticMargin,
+            "mission_range_envelope_forecast": AerodesignMissionRange,
         },
         "turbomachinery_degradation": {
             "turbomachinery_health_forecast": TurbomachineryDegradation,
@@ -75,9 +83,11 @@ DOMAINS: dict[str, dict[str, dict[str, type]]] = {
         },
         "statistical_arbitrage": {
             "spread_mean_reversion_forecast": StatisticalArbitrage,
+            "alpha_signal_decay_forecast": AlphaSignalDecay,
         },
         "risk_and_execution_research": {
             "execution_slippage_forecast": RiskExecutionResearch,
+            "drawdown_risk_envelope_forecast": DrawdownRiskEnvelope,
         },
     },
     "supply_chain": {

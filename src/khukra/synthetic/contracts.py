@@ -23,6 +23,11 @@ def validate_dataframe_contract(
     if row_count < min_rows:
         errors.append(f"row_count {row_count} < min_rows {min_rows}")
 
+    if contract.get("column_null_ratios"):
+        for col, ratio in contract["column_null_ratios"].items():
+            if ratio > max_null_ratio:
+                errors.append(f"null ratio for {col}: {ratio} > {max_null_ratio}")
+
     passed = len(errors) == 0
     return {
         "passed": passed,

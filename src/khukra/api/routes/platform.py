@@ -5,7 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from khukra.api.routes.query import query_catalog, run_query
+from khukra.application.container import get_app_container
 from khukra.api.schemas import (
     AnalyticsCatalogResponse,
     DataGenerationCatalogResponse,
@@ -270,12 +270,13 @@ def platform_analytics(
     body: QueryRequest,
     user: dict = Depends(require_user),
 ) -> QueryResponse:
-    return run_query(body, user)
+    result = get_app_container().query.run(body.sql, limit=body.limit)
+    return QueryResponse(**result)
 
 
 @router.get("/analytics/catalog", response_model=AnalyticsCatalogResponse)
 def platform_analytics_catalog(user: dict = Depends(require_user)) -> AnalyticsCatalogResponse:
-    data = query_catalog(user)
+    data = get_app_container().query.catalog()
     return AnalyticsCatalogResponse(**data)
 
 

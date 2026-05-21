@@ -130,8 +130,25 @@ class SyntheticDataEngine:
             content_hash=content_hash,
         )
 
+        from khukra.data.services.data_products import get_data_product_service
+
+        product_id = get_data_product_service().register_synthetic(
+            dataset_id=dataset_id,
+            domain=scenario.domain,
+            subdomain=scenario.subdomain,
+            model_id=scenario.model_id,
+            file_uri=str(path),
+            row_count=len(df),
+            column_schema=profile["dtypes"],
+            validation=validation,
+            scenario_id=scenario.scenario_id,
+            seed=scenario.seed,
+            version_label=version_label,
+        )
+
         return {
             "dataset_id": dataset_id,
+            "product_id": product_id,
             "scenario_id": scenario.scenario_id,
             "file_uri": str(path),
             "row_count": len(df),

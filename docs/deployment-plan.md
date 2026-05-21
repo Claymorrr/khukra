@@ -11,9 +11,9 @@ Checklist for moving from local MVP to a hosted demo/pilot environment. Track pr
 
 | Decision | Options | Choice |
 |----------|---------|--------|
-| **API host** | Railway, Render, Fly.io, Azure Container Apps, VPS + Docker | _TBD_ |
-| **Frontend host** | Vercel, Netlify, same host as API, static behind CDN | _TBD_ |
-| **Database** | DuckDB on persistent volume, managed Postgres + DuckDB attach, object store + DuckDB | _TBD_ |
+| **API host** | Railway, Render, Fly.io, Azure Container Apps, VPS + Docker | **Render / Fly.io** container (see `Dockerfile`) |
+| **Frontend host** | Vercel, Netlify, same host as API, static behind CDN | **Vercel** (`frontend` Next.js build) |
+| **Database** | DuckDB on persistent volume, managed Postgres + DuckDB attach, object store + DuckDB | **DuckDB** on persistent volume via `KHUKRA_DATA_ROOT` |
 | **Domain** | Custom domain + TLS | _TBD_ |
 | **Auth in prod** | Change admin password; rotate `KHUKRA_SECRET_KEY` | Required |
 

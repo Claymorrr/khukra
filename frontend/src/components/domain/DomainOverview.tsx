@@ -108,6 +108,38 @@ export function DomainOverview({
         <ManifestList title="Data Products" items={manifest.data_products} accentColor={accentColor} />
       </div>
 
+      {(manifest.data_product_bindings?.length ?? 0) > 0 && (
+        <section className="rounded-2xl border border-white/10 bg-black/20 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h4 className="text-sm font-medium text-zinc-300">Product families</h4>
+            <button
+              type="button"
+              onClick={() => onNavigate("data_hub")}
+              className="text-xs text-zinc-500 hover:text-zinc-300"
+              style={{ color: accentColor }}
+            >
+              Open Data Hub →
+            </button>
+          </div>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            {manifest.data_product_bindings!.map((b) => (
+              <li
+                key={b.family_id}
+                className="rounded-xl border border-white/10 px-3 py-2 text-xs text-zinc-500"
+              >
+                <span className="font-medium text-zinc-300">{b.label}</span>
+                <span className="ml-2 text-zinc-600">{b.kind}</span>
+                {manifest.data_product_ids?.length ? (
+                  <span className="mt-1 block font-mono text-[10px] text-zinc-600">
+                    {manifest.data_product_ids.length} linked product(s)
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {manifest.ops_capabilities.length > 0 && (
         <section className="rounded-2xl border border-white/10 bg-black/20 p-5">
           <h4 className="text-sm font-medium text-zinc-300">Ops Layer</h4>

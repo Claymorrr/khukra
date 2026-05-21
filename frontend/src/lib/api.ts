@@ -3,8 +3,11 @@ import { normalizeDomain } from "./domainManifest";
 import type {
   CatalogResponse,
   ComparisonResponse,
+  DataProductDetail,
+  DataProductInfo,
   DatasetInfo,
   InferenceResponse,
+  KnowledgeAssetInfo,
   RunResponse,
   RunSummary,
   SweepResponse,
@@ -470,5 +473,57 @@ export function platformAnalyticsQuery(sql: string, limit = 100): Promise<QueryR
 
 export function getPlatformAnalyticsCatalog(): Promise<QueryCatalog> {
   return fetchJson("/platform/analytics/catalog");
+}
+
+export function listDataProducts(
+  domain?: string,
+  kind?: string
+): Promise<{ products: DataProductInfo[]; total: number }> {
+  const params = new URLSearchParams();
+  if (domain) params.set("domain", domain);
+  if (kind) params.set("kind", kind);
+  const q = params.toString() ? `?${params}` : "";
+  return fetchJson(`/data-products${q}`);
+}
+
+export function getDataProduct(productId: string): Promise<DataProductDetail> {
+  return fetchJson(`/data-products/${encodeURIComponent(productId)}`);
+}
+
+export function syncDataProducts(): Promise<{ synced: number }> {
+  return fetchJson("/data-products/sync", { method: "POST" });
+}
+
+export function listKnowledgeAssets(
+  domain?: string,
+  productId?: string,
+  assetType?: string
+): Promise<KnowledgeAssetInfo[]> {
+  const params = new URLSearchParams();
+  if (domain) params.set("domain", domain);
+  if (productId) params.set("product_id", productId);
+  if (assetType) params.set("asset_type", assetType);
+  const q = params.toString() ? `?${params}` : "";
+  return fetchJson(`/knowledge/assets${q}`);
+}
+
+export function createKnowledgeAsset(body: {
+  asset_type: string;
+  title: string;
+  content?: Record<string, unknown>;
+  product_id?: string;
+  domain?: string;
+}): Promise<KnowledgeAssetInfo> {
+  return fetchJson("/knowledge/assets", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function saveKnowledgeQuery(body: {
+  name: string;
+  sql_text: string;
+  product_id?: string;
+  domain?: string;
+  metadata?: Record<string, unknown>;
+}): Promise<{ query_id: string; name: string; sql_text: string }> {
+  return fetchJson("/knowledge/queries", { method: "POST", body: JSON.stringify(body) });
 }
 

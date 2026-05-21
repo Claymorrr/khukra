@@ -30,7 +30,9 @@ import { SeriesChart } from "../SeriesChart";
 import { SmartDocumentationPanel } from "../SmartDocumentationPanel";
 import { SweepPanel } from "../SweepPanel";
 import { AnalyticsWorkbench } from "../platform/AnalyticsWorkbench";
+import { DataHub } from "../platform/DataHub";
 import { DataGenerationStudio } from "../platform/DataGenerationStudio";
+import { KnowledgePanel } from "../platform/KnowledgePanel";
 import { InsightsEngineering } from "../platform/InsightsEngineering";
 import { MLInferencingPanel } from "../platform/MLInferencingPanel";
 import { DevOpsPanel, InfraOpsPanel } from "../platform/OpsReadinessPanel";
@@ -51,6 +53,8 @@ const DOMAIN_NAV_ICONS: Record<string, typeof Box> = {
 type PanelProps = { accentColor: string; domainId: string };
 
 const PLATFORM_PANELS: Partial<Record<DomainModule, ComponentType<PanelProps>>> = {
+  data_hub: DataHub,
+  knowledge: KnowledgePanel,
   data_generation: DataGenerationStudio,
   mlops: PlatformMLOpsPanel,
   infraops: InfraOpsPanel,
@@ -216,6 +220,8 @@ export function DomainShell({
   const ActivePlatformPanel = PLATFORM_PANELS[moduleFromUrl];
   const showScenarioControls = ![
     "overview",
+    "data_hub",
+    "knowledge",
     "data_generation",
     "mlops",
     "infraops",
@@ -417,7 +423,7 @@ export function DomainShell({
 
             {ActivePlatformPanel && <ActivePlatformPanel accentColor={accent} domainId={domainId} />}
 
-            {!["overview", "inference", "results", "docs", "sweeps", "compare", "data", "history"].includes(
+            {!["overview", "inference", "results", "docs", "sweeps", "compare", "data", "data_hub", "knowledge", "history"].includes(
               moduleFromUrl
             ) &&
               !ActivePlatformPanel && (

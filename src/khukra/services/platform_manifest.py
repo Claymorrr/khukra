@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any
 
 from khukra.domains.meta import DOMAIN_ICONS, DOMAIN_META
 from khukra.domains.registry import list_domains
+
+_PLUGINS_PATH = Path(__file__).resolve().parents[3] / "config" / "plugins.json"
 
 PLATFORM_MODULES: list[dict[str, Any]] = [
     {
@@ -122,6 +126,16 @@ PLATFORM_MODULES: list[dict[str, Any]] = [
 ]
 
 
+def _load_plugin_modules() -> list[dict[str, Any]]:
+    if not _PLUGINS_PATH.is_file():
+        return []
+    try:
+        raw = json.loads(_PLUGINS_PATH.read_text(encoding="utf-8"))
+        return [m for m in raw if isinstance(m, dict) and m.get("enabled", True)]
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
 class PlatformManifestService:
     def _build_domains(self) -> list[dict[str, Any]]:
         domains: list[dict[str, Any]] = []
@@ -139,8 +153,17 @@ class PlatformManifestService:
         return domains
 
     def build(self) -> dict[str, Any]:
+        plugins = _load_plugin_modules()
+        base = [m for m in PLATFORM_MODULES if m.get("enabled", True)]
+        seen = {m["id"] for m in base}
+        merged = list(base)
+        for plug in plugins:
+            if plug.get("id") not in seen:
+                merged.append(plug)
+                seen.add(plug["id"])
+        merged.sort(key=lambda m: m.get("order", 99))
         return {
-            "version": "1.0",
+            "version": "1.1",
             "workspace": "platform",
             "feature_flags": {
                 "dynamic_navigation": True,
@@ -149,7 +172,9 @@ class PlatformManifestService:
                 "dataset_to_inference": True,
                 "pipeline_templates": True,
                 "integrated_ops": True,
+                "plugin_modules": bool(plugins),
             },
             "domains": self._build_domains(),
-            "modules": [m for m in PLATFORM_MODULES if m.get("enabled", True)],
+            "modules": merged,
+            "plugins": plugins,
         }

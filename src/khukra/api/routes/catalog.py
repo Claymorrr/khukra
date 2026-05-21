@@ -4,12 +4,14 @@ from fastapi import APIRouter
 
 from khukra.api.schemas import (
     CatalogResponse,
+    DataProductBindingInfo,
     DomainInfo,
     DomainManifestInfo,
     ModelInfo,
     ParameterSchema,
     SubdomainInfo,
 )
+from khukra.application.container import get_app_container
 from khukra.domains.meta import DOMAIN_MANIFESTS, DOMAIN_META
 from khukra.services.parameter_metadata import enrich_parameter
 from khukra.versioning.policy import CATALOG_SCHEMA_VERSION
@@ -43,6 +45,7 @@ def get_catalog() -> CatalogResponse:
     from khukra.domains.registry import get_model
 
     registry = get_version_registry()
+    product_uc = get_app_container().products
     domains: list[DomainInfo] = []
     for domain_id in list_domains():
         meta = DOMAIN_META[domain_id]
@@ -72,6 +75,22 @@ def get_catalog() -> CatalogResponse:
         manifest_raw = dict(DOMAIN_MANIFESTS.get(domain_id, {}))
         manifest_raw.setdefault("entity_id", domain_id)
         manifest_raw.setdefault("version", "1.0.0")
+        bindings_raw = manifest_raw.pop("data_product_bindings", [])
+        bindings = [
+            b if isinstance(b, DataProductBindingInfo) else DataProductBindingInfo(**b)
+            for b in bindings_raw
+        ]
+        if bindings and not manifest_raw.get("data_products"):
+            manifest_raw["data_products"] = [b.label for b in bindings]
+        family_ids = [b.family_id for b in bindings]
+        manifest_raw["data_product_bindings"] = [b.model_dump() for b in bindings]
+        manifest_raw["data_product_ids"] = product_uc.resolve_domain_bindings(
+            domain_id, family_ids
+        )
+        manifest_raw.setdefault(
+            "recommended_workflows",
+            ["data_hub", "data_generation", "analytics", "mlops"],
+        )
         latest_manifest = registry.get_latest("domain_manifest", domain_id)
         if latest_manifest:
             manifest_raw["version"] = latest_manifest["version_label"]

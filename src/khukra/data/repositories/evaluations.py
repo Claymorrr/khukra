@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from khukra.data.engine import DataEngine, get_engine
+from khukra.versioning.service import get_version_registry
 
 
 class EvaluationRepository:
@@ -41,6 +42,13 @@ class EvaluationRepository:
                     user_id,
                 ],
             )
+        get_version_registry().register(
+            "evaluation_run",
+            eval_id,
+            "1.0.0",
+            metadata={"benchmark": benchmark_name, "passed": passed},
+            content_hash=get_version_registry().content_hash(metrics),
+        )
         return eval_id
 
     def list_recent(self, limit: int = 50) -> list[dict[str, Any]]:

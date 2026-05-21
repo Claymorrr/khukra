@@ -24,6 +24,13 @@ export interface SubdomainInfo {
   models: ModelInfo[];
 }
 
+export interface DataProductBindingInfo {
+  family_id: string;
+  label: string;
+  kind: string;
+  description?: string;
+}
+
 export interface DomainManifestInfo {
   entity_id?: string;
   version?: string;
@@ -32,9 +39,61 @@ export interface DomainManifestInfo {
   primary_focus: string[];
   model_families: string[];
   data_products: string[];
+  data_product_bindings?: DataProductBindingInfo[];
+  data_product_ids?: string[];
+  recommended_workflows?: string[];
   ops_capabilities: string[];
   module_order: string[];
   roadmap: string[];
+}
+
+export interface DataProductInfo {
+  product_id: string;
+  name: string;
+  kind: string;
+  domain_ids: string[];
+  source_type: string;
+  source_id: string;
+  storage_uri?: string | null;
+  row_count?: number | null;
+  column_schema: Record<string, string>;
+  contract_id?: string | null;
+  version_label: string;
+  quality_status: string;
+  lineage_status: string;
+  metadata: Record<string, unknown>;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface DataProductDetail extends DataProductInfo {
+  versions: Array<Record<string, unknown>>;
+  lineage_edges: Array<Record<string, unknown>>;
+  profile?: Record<string, unknown> | null;
+  preview?: { columns: string[]; rows: Array<Record<string, unknown>> } | null;
+  knowledge_assets: KnowledgeAssetInfo[];
+  saved_queries: SavedQueryInfo[];
+}
+
+export interface KnowledgeAssetInfo {
+  asset_id: string;
+  asset_type: string;
+  title: string;
+  product_id?: string | null;
+  domain?: string | null;
+  content: Record<string, unknown>;
+  version_label: string;
+  created_at?: string | null;
+}
+
+export interface SavedQueryInfo {
+  query_id: string;
+  name: string;
+  sql_text: string;
+  product_id?: string | null;
+  domain?: string | null;
+  metadata: Record<string, unknown>;
+  created_at?: string | null;
 }
 
 export interface VersioningSummary {

@@ -4,10 +4,15 @@ from __future__ import annotations
 
 from typing import Any
 
+from pathlib import Path
+
+from khukra.config import data_root
 from khukra.data.engine import get_engine
 from khukra.data.repositories.jobs import JobRepository
 from khukra.domains.meta import DOMAIN_MANIFESTS
 from khukra.versioning.service import get_version_registry
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 class OpsService:
@@ -140,11 +145,19 @@ class OpsService:
         recent_jobs: list[dict[str, Any]],
     ) -> dict[str, Any]:
         completed_jobs = sum(1 for job in recent_jobs if job.get("status") == "completed")
-        score = 30
-        score += 25 if latest_manifest else 0
-        score += 20 if counts["versions"] else 0
-        score += 15 if completed_jobs else 0
+        ci_present = (_REPO_ROOT / ".github" / "workflows" / "ci.yml").is_file()
+        docker_present = (_REPO_ROOT / "Dockerfile").is_file()
+        env_example = (_REPO_ROOT / ".env.example").is_file()
+        data_root_ok = data_root().exists()
+        score = 20
+        score += 20 if latest_manifest else 0
+        score += 15 if counts["versions"] else 0
+        score += 10 if completed_jobs else 0
         score += 10 if domain in DOMAIN_MANIFESTS else 0
+        score += 10 if ci_present else 0
+        score += 10 if docker_present else 0
+        score += 5 if env_example else 0
+        score += 10 if data_root_ok else 0
         return {
             "id": "devops",
             "label": "DevOps",
@@ -156,6 +169,10 @@ class OpsService:
                 {"label": "Version registry active", "passed": counts["versions"] > 0},
                 {"label": "Recent domain jobs completed", "passed": completed_jobs > 0},
                 {"label": "Domain config present", "passed": domain in DOMAIN_MANIFESTS},
+                {"label": "CI workflow present", "passed": ci_present},
+                {"label": "Production Dockerfile present", "passed": docker_present},
+                {"label": "Env template documented", "passed": env_example},
+                {"label": "Data root reachable", "passed": data_root_ok},
             ],
         }
 

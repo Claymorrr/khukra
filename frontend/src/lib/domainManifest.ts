@@ -2,6 +2,8 @@ import type { DomainInfo, DomainManifestInfo } from "./types";
 
 const DEFAULT_MODULE_ORDER = [
   "overview",
+  "data_hub",
+  "knowledge",
   "inference",
   "results",
   "sweeps",
@@ -26,6 +28,9 @@ const EMPTY_MANIFEST: DomainManifestInfo = {
   primary_focus: [],
   model_families: [],
   data_products: [],
+  data_product_bindings: [],
+  data_product_ids: [],
+  recommended_workflows: [],
   ops_capabilities: [],
   module_order: DEFAULT_MODULE_ORDER,
   roadmap: [],
@@ -46,6 +51,9 @@ export function normalizeDomainManifest(
     primary_focus: merged.primary_focus ?? [],
     model_families: merged.model_families ?? [],
     data_products: merged.data_products ?? [],
+    data_product_bindings: merged.data_product_bindings ?? [],
+    data_product_ids: merged.data_product_ids ?? [],
+    recommended_workflows: merged.recommended_workflows ?? [],
     ops_capabilities: merged.ops_capabilities ?? [],
     roadmap: merged.roadmap ?? [],
   };

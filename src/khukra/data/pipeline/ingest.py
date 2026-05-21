@@ -57,8 +57,25 @@ class IngestPipeline:
                 domain_tag=domain_tag,
                 user_id=user_id,
             )
+            meta = self.datasets.get(dataset_id) or {}
+            from khukra.data.services.data_products import get_data_product_service
 
-            result = {"dataset_id": dataset_id, "rows": len(df), "columns": list(df.columns)}
+            product_id = get_data_product_service().register_uploaded(
+                dataset_id=dataset_id,
+                name=meta.get("name") or name or source_path.stem,
+                domain_tag=domain_tag,
+                file_path=str(dest),
+                row_count=len(df),
+                column_schema=meta.get("column_schema") or {},
+                source_type_label=source_type,
+            )
+
+            result = {
+                "dataset_id": dataset_id,
+                "product_id": product_id,
+                "rows": len(df),
+                "columns": list(df.columns),
+            }
             self._log_job(job_id, "ingest", "completed", {}, result)
             return {"job_id": job_id, **result}
 

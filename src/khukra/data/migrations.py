@@ -259,6 +259,124 @@ MIGRATIONS: list[tuple[int, str]] = [
         ALTER TABLE synthetic_datasets ADD COLUMN IF NOT EXISTS version_label VARCHAR DEFAULT '1.0.0';
         """,
     ),
+    (
+        5,
+        """
+        CREATE TABLE IF NOT EXISTS data_products (
+            product_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            updated_at TIMESTAMP NOT NULL,
+            name VARCHAR NOT NULL,
+            kind VARCHAR NOT NULL,
+            domain_ids JSON NOT NULL,
+            source_type VARCHAR NOT NULL,
+            source_id VARCHAR NOT NULL,
+            storage_uri VARCHAR,
+            row_count INTEGER,
+            column_schema JSON,
+            contract_id VARCHAR,
+            version_label VARCHAR DEFAULT '1.0.0',
+            quality_status VARCHAR DEFAULT 'unknown',
+            lineage_status VARCHAR DEFAULT 'partial',
+            metadata JSON
+        );
+
+        CREATE TABLE IF NOT EXISTS knowledge_assets (
+            asset_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            asset_type VARCHAR NOT NULL,
+            title VARCHAR NOT NULL,
+            product_id VARCHAR,
+            domain VARCHAR,
+            content JSON,
+            version_label VARCHAR DEFAULT '1.0.0',
+            user_id VARCHAR
+        );
+
+        CREATE TABLE IF NOT EXISTS saved_queries (
+            query_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            name VARCHAR NOT NULL,
+            sql_text TEXT NOT NULL,
+            product_id VARCHAR,
+            domain VARCHAR,
+            metadata JSON,
+            user_id VARCHAR
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_data_products_domain ON data_products(domain_ids);
+        CREATE INDEX IF NOT EXISTS idx_data_products_source ON data_products(source_type, source_id);
+        CREATE INDEX IF NOT EXISTS idx_knowledge_product ON knowledge_assets(product_id);
+        CREATE INDEX IF NOT EXISTS idx_saved_queries_domain ON saved_queries(domain);
+        """,
+    ),
+    (
+        6,
+        """
+        CREATE TABLE IF NOT EXISTS workflow_runs (
+            workflow_run_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            updated_at TIMESTAMP NOT NULL,
+            workflow_type VARCHAR NOT NULL,
+            status VARCHAR DEFAULT 'running',
+            domain VARCHAR,
+            product_id VARCHAR,
+            payload JSON,
+            result JSON,
+            user_id VARCHAR
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_workflow_runs_domain ON workflow_runs(domain);
+        CREATE INDEX IF NOT EXISTS idx_workflow_runs_type ON workflow_runs(workflow_type);
+        """,
+    ),
+    (
+        7,
+        """
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            audit_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            action VARCHAR NOT NULL,
+            entity_type VARCHAR NOT NULL,
+            entity_id VARCHAR NOT NULL,
+            user_id VARCHAR,
+            metadata JSON,
+            request_id VARCHAR
+        );
+
+        CREATE TABLE IF NOT EXISTS product_version_snapshots (
+            snapshot_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            product_id VARCHAR NOT NULL,
+            version_label VARCHAR NOT NULL,
+            schema_hash VARCHAR,
+            contract_id VARCHAR,
+            quality_run_id VARCHAR,
+            storage_uri VARCHAR,
+            profile JSON,
+            validation JSON,
+            parent_product_id VARCHAR,
+            promotion_state VARCHAR DEFAULT 'draft',
+            metadata JSON
+        );
+
+        CREATE TABLE IF NOT EXISTS external_models (
+            external_model_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            name VARCHAR NOT NULL,
+            domain VARCHAR,
+            provider VARCHAR,
+            endpoint VARCHAR,
+            schema JSON,
+            version_label VARCHAR DEFAULT '1.0.0',
+            stage VARCHAR DEFAULT 'staging',
+            user_id VARCHAR
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
+        CREATE INDEX IF NOT EXISTS idx_product_snapshots_product ON product_version_snapshots(product_id);
+        """,
+    ),
 ]
 
 

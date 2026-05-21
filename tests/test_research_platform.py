@@ -9,14 +9,14 @@ from khukra.inference.registry import get_registry, model_key
 from khukra.services.mlops_pipeline import MLOpsPipeline
 
 
-def test_five_domains_sixteen_models():
+def test_five_domains_twenty_models():
     assert len(list_domains()) == 5
     total = sum(
         len(list_models(d, s))
         for d in list_domains()
         for s in list_subdomains(d)
     )
-    assert total == 16
+    assert total == 20
     assert "aerodesign" in list_subdomains("physical")
 
 

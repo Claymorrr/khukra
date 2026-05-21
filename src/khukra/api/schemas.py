@@ -29,6 +29,13 @@ class SubdomainInfo(BaseModel):
     models: list[ModelInfo]
 
 
+class DataProductBindingInfo(BaseModel):
+    family_id: str
+    label: str
+    kind: str = "synthetic"
+    description: str = ""
+
+
 class DomainManifestInfo(BaseModel):
     entity_id: str = ""
     version: str = "1.0.0"
@@ -37,9 +44,82 @@ class DomainManifestInfo(BaseModel):
     primary_focus: list[str] = Field(default_factory=list)
     model_families: list[str] = Field(default_factory=list)
     data_products: list[str] = Field(default_factory=list)
+    data_product_bindings: list[DataProductBindingInfo] = Field(default_factory=list)
+    data_product_ids: list[str] = Field(default_factory=list)
+    recommended_workflows: list[str] = Field(default_factory=list)
     ops_capabilities: list[str] = Field(default_factory=list)
     module_order: list[str] = Field(default_factory=list)
     roadmap: list[str] = Field(default_factory=list)
+
+
+class DataProductInfo(BaseModel):
+    product_id: str
+    name: str
+    kind: str
+    domain_ids: list[str] = Field(default_factory=list)
+    source_type: str
+    source_id: str
+    storage_uri: str | None = None
+    row_count: int | None = None
+    column_schema: dict[str, Any] = Field(default_factory=dict)
+    contract_id: str | None = None
+    version_label: str = "1.0.0"
+    quality_status: str = "unknown"
+    lineage_status: str = "partial"
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: str | None = None
+    updated_at: str | None = None
+
+
+class DataProductListResponse(BaseModel):
+    products: list[DataProductInfo]
+    total: int
+
+
+class DataProductDetail(DataProductInfo):
+    versions: list[dict[str, Any]] = Field(default_factory=list)
+    lineage_edges: list[dict[str, Any]] = Field(default_factory=list)
+    profile: dict[str, Any] | None = None
+    preview: dict[str, Any] | None = None
+    knowledge_assets: list["KnowledgeAssetInfo"] = Field(default_factory=list)
+    saved_queries: list["SavedQueryInfo"] = Field(default_factory=list)
+
+
+class KnowledgeAssetInfo(BaseModel):
+    asset_id: str
+    asset_type: str
+    title: str
+    product_id: str | None = None
+    domain: str | None = None
+    content: dict[str, Any] = Field(default_factory=dict)
+    version_label: str = "1.0.0"
+    created_at: str | None = None
+
+
+class KnowledgeAssetCreate(BaseModel):
+    asset_type: str
+    title: str
+    content: dict[str, Any] = Field(default_factory=dict)
+    product_id: str | None = None
+    domain: str | None = None
+
+
+class SavedQueryInfo(BaseModel):
+    query_id: str
+    name: str
+    sql_text: str
+    product_id: str | None = None
+    domain: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: str | None = None
+
+
+class SavedQueryCreate(BaseModel):
+    name: str
+    sql_text: str
+    product_id: str | None = None
+    domain: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class EntityVersionInfo(BaseModel):
@@ -244,6 +324,7 @@ class DatasetInfo(BaseModel):
 class IngestResponse(BaseModel):
     job_id: str
     dataset_id: str
+    product_id: str | None = None
     rows: int
     columns: list[str]
 

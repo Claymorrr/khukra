@@ -1,0 +1,32 @@
+[
+  {
+    "id": "data_hub",
+    "label": "Data Hub",
+    "description": "Product catalog, contracts, freshness, and lineage.",
+    "route_id": "data_hub",
+    "icon": "database",
+    "order": 2,
+    "capabilities": ["catalog", "contracts", "lineage", "quality"],
+    "enabled": true
+  },
+  {
+    "id": "knowledge",
+    "label": "Knowledge",
+    "description": "Saved queries, reports, and knowledge assets.",
+    "route_id": "knowledge",
+    "icon": "book-open",
+    "order": 3,
+    "capabilities": ["saved_queries", "assets"],
+    "enabled": true
+  },
+  {
+    "id": "dataops",
+    "label": "DataOps",
+    "description": "Contracts, profiling, quality gates, and readiness.",
+    "route_id": "dataops",
+    "icon": "shield-check",
+    "order": 4,
+    "capabilities": ["contracts", "quality", "freshness", "readiness"],
+    "enabled": true
+  }
+]

@@ -7,6 +7,8 @@ export type DomainModule =
   | "docs"
   | "history"
   | "data"
+  | "data_hub"
+  | "knowledge"
   | "data_generation"
   | "mlops"
   | "infraops"
@@ -23,6 +25,8 @@ export const DOMAIN_MODULES: Array<{ id: DomainModule; label: string }> = [
   { id: "compare", label: "Compare" },
   { id: "docs", label: "Docs" },
   { id: "history", label: "History" },
+  { id: "data_hub", label: "Data Hub" },
+  { id: "knowledge", label: "Knowledge" },
   { id: "data", label: "Datasets" },
   { id: "data_generation", label: "Data Generation" },
   { id: "mlops", label: "MLOps" },

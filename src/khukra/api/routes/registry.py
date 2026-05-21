@@ -3,9 +3,11 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from khukra.api.routes.external_models import router as external_models_router
 from khukra.data.repositories.artifacts import ArtifactRepository
 
 router = APIRouter(prefix="/registry")
+router.include_router(external_models_router)
 _repo = ArtifactRepository()
 
 

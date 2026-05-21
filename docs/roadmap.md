@@ -54,6 +54,27 @@ Priority domains:
 - **Physical Systems**: advanced Aerodesign operating environment
 - **Finance**: Quant Trading research and operations environment
 
+## Solution architecture remodel (in progress)
+
+Khukra is becoming a **Data Product OS** with explicit bounded contexts:
+
+| Layer | Location | Responsibility |
+|-------|----------|----------------|
+| **Application** | `src/khukra/application/` | Products, workflows, governance, lineage, knowledge use cases |
+| **API v1** | `/api/v1/*` | Product-centric control plane (legacy `/api/*` wraps use cases) |
+| **Workflow runs** | `workflow_runs` (migration v6) | Governed ingest / generate / infer / query executions |
+| **Frontend shell** | `/d/[domainId]/[zone]` | Discover · Data · Knowledge · Workflows · Operations |
+
+**Navigation:** `/` → workspace → `/d/{domain}/data`; `/domain/{id}?module=…` redirects to zone routes.
+
+**Write path:** ingest and synthetic registration flow through `DataProductService` + `WorkflowRunRepository` + lineage graph; evaluations register `entity_versions`.
+
+### Data-centered foundation (shipped)
+
+- **`data_products`**, **knowledge_assets**, **saved_queries** (migration v5)
+- Catalog **v1.1** with `data_product_bindings` and resolved `data_product_ids`
+- Legacy domain modules remain during transition
+
 ## Versioning architecture (foundation shipped — #28 open)
 
 See [versioning.md](./versioning.md) for the current entity registry, manifest/model/dataset version labels, lineage metadata, and compatibility policy. #28 remains open because pipeline templates/runs, evaluation artifacts, analytics queries, reports/exports, app/API releases, and ingested datasets still need first-class version coverage.
