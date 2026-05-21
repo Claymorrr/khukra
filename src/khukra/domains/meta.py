@@ -50,6 +50,8 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
             "data_generation",
             "data",
             "mlops",
+            "infraops",
+            "devops",
             "analytics",
             "insights",
         ],
@@ -91,6 +93,8 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
             "compare",
             "data_generation",
             "mlops",
+            "infraops",
+            "devops",
             "insights",
         ],
         "roadmap": [
@@ -129,7 +133,7 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
         "model_families": ["Latency incident forecasts", "GPU throughput forecasts", "Edge degradation forecasts"],
         "data_products": ["Runtime traces", "Reliability scenarios", "Throughput profiles"],
         "ops_capabilities": ["InfraOps", "DevOps", "MLOps", "Versioning"],
-        "module_order": ["overview", "inference", "mlops", "analytics", "insights"],
+        "module_order": ["overview", "inference", "infraops", "devops", "mlops", "analytics", "insights"],
         "roadmap": ["Add reliability SLO views", "Connect runtime ops to model readiness"],
     },
 }

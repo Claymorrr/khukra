@@ -41,10 +41,6 @@ Khukra is **domain-first** end-to-end:
 
 ## Domain Manifest Architecture (done)
 
-See [versioning.md](./versioning.md) for entity IDs, version labels, lineage metadata, and compatibility policy.
-
-## Versioning architecture (done — #28)
-
 Each domain carries manifest metadata that shapes how it appears and how future features are organized:
 
 - **Identity**: label, color, tagline, positioning
@@ -57,6 +53,20 @@ Priority domains:
 
 - **Physical Systems**: advanced Aerodesign operating environment
 - **Finance**: Quant Trading research and operations environment
+
+## Versioning architecture (done — #28)
+
+See [versioning.md](./versioning.md) for entity IDs, version labels, lineage metadata, and compatibility policy.
+
+## Integrated operations (done — #24)
+
+InfraOps, DevOps, and MLOps are exposed inside domain workspaces rather than only as generic platform concepts:
+
+- **InfraOps**: warehouse, storage, runtime, and service readiness signals
+- **DevOps**: manifest/version release gates, environment contract, and job health
+- **MLOps**: pipeline templates, model registry, evaluations, lineage, and promotion readiness
+
+Physical and Finance declare the full ops set and show domain-specific readiness from `/api/platform/ops/summary`.
 
 ---
 

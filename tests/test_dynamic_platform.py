@@ -12,8 +12,11 @@ def test_platform_manifest_modules():
     ids = {m["id"] for m in manifest["modules"]}
     assert "ml_inference" in ids
     assert "data_generation" in ids
+    assert "infraops" in ids
+    assert "devops" in ids
     assert manifest["feature_flags"]["dynamic_navigation"] is True
     assert manifest["feature_flags"]["domain_first_navigation"] is True
+    assert manifest["feature_flags"]["integrated_ops"] is True
     assert len(manifest["domains"]) >= 5
     domain_ids = {d["id"] for d in manifest["domains"]}
     assert "physical" in domain_ids
@@ -53,9 +56,30 @@ def test_catalog_exposes_domain_manifest():
     assert "Aerodesign" in physical.label
     assert "aerodesign" in physical.manifest.tagline.lower()
     assert "MLOps" in physical.manifest.ops_capabilities
+    assert "InfraOps" in physical.manifest.ops_capabilities
+    assert "DevOps" in physical.manifest.ops_capabilities
     assert "data_generation" in physical.manifest.module_order
+    assert "infraops" in physical.manifest.module_order
+    assert "devops" in physical.manifest.module_order
     assert "Quant Trading" in finance.label
+    assert "InfraOps" in finance.manifest.ops_capabilities
+    assert "DevOps" in finance.manifest.ops_capabilities
     assert "Alpha" in " ".join(finance.manifest.primary_focus)
+
+
+def test_ops_summary_for_domain():
+    from khukra.services.ops import OpsService
+    from khukra.versioning.bootstrap import ensure_domain_manifest_versions
+
+    ensure_domain_manifest_versions()
+    summary = OpsService().domain_summary("physical")
+
+    assert summary["domain"] == "physical"
+    assert "InfraOps" in summary["capabilities"]
+    assert "DevOps" in summary["capabilities"]
+    readiness_ids = {item["id"] for item in summary["readiness"]}
+    assert {"infraops", "devops", "mlops"}.issubset(readiness_ids)
+    assert summary["release"]["domain_manifest_version"]
 
 
 def test_catalog_enriched_parameters():

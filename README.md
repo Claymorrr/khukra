@@ -37,7 +37,7 @@
 | **Intelligence** | Computational modeling systems for signal fusion, influence dynamics, adversarial indications |
 | **Computing** | Computational modeling systems for distributed reliability, ML accelerators, cyber-physical edge |
 
-Each domain has a manifest: identity, focus areas, model families, data products, ops capabilities, module ordering, and roadmap metadata.
+Each domain has a manifest: identity, focus areas, model families, data products, ops capabilities, module ordering, and roadmap metadata. Domain workspaces include integrated operations views for MLOps, InfraOps, DevOps, DataOps, and version-aware readiness signals where the domain declares them.
 
 ## Setup
 

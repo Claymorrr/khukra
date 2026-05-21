@@ -43,4 +43,4 @@ Policies live in `src/khukra/versioning/policy.py` (`COMPATIBILITY_POLICY`):
 
 ## UI
 
-Domain overview shows manifest `entity_id` and `version`. Ops modules (DataOps, MLOps) consume the same labels via catalog and lineage metadata.
+Domain overview shows manifest `entity_id` and `version`. Ops modules (DataOps, MLOps, InfraOps, DevOps) consume the same labels via catalog, `/api/platform/ops/summary`, and lineage metadata. DevOps readiness treats manifest versions as release gates, while InfraOps uses warehouse/runtime signals to show whether a domain is operationally ready.

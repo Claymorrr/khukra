@@ -24,6 +24,14 @@ const QUICK_MODULES: DomainModule[] = [
   "insights",
 ];
 
+const OPS_MODULES: Record<string, DomainModule> = {
+  DataOps: "data_generation",
+  MLOps: "mlops",
+  InfraOps: "infraops",
+  DevOps: "devops",
+  Versioning: "insights",
+};
+
 export function DomainOverview({
   domain,
   accentColor,
@@ -104,13 +112,15 @@ export function DomainOverview({
           <h4 className="text-sm font-medium text-zinc-300">Ops Layer</h4>
           <div className="mt-4 flex flex-wrap gap-2">
             {manifest.ops_capabilities.map((item) => (
-              <span
+              <button
                 key={item}
+                type="button"
+                onClick={() => onNavigate(OPS_MODULES[item] ?? "insights")}
                 className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-zinc-400"
                 style={{ borderColor: `${accentColor}44` }}
               >
                 {item}
-              </span>
+              </button>
             ))}
           </div>
         </section>

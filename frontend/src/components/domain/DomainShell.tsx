@@ -33,6 +33,7 @@ import { AnalyticsWorkbench } from "../platform/AnalyticsWorkbench";
 import { DataGenerationStudio } from "../platform/DataGenerationStudio";
 import { InsightsEngineering } from "../platform/InsightsEngineering";
 import { MLInferencingPanel } from "../platform/MLInferencingPanel";
+import { DevOpsPanel, InfraOpsPanel } from "../platform/OpsReadinessPanel";
 import { PlatformMLOpsPanel } from "../platform/PlatformMLOpsPanel";
 import { DomainOverview } from "./DomainOverview";
 import { DomainSidebar } from "./DomainSidebar";
@@ -51,6 +52,8 @@ type PanelProps = { accentColor: string; domainId: string };
 const PLATFORM_PANELS: Partial<Record<DomainModule, ComponentType<PanelProps>>> = {
   data_generation: DataGenerationStudio,
   mlops: PlatformMLOpsPanel,
+  infraops: InfraOpsPanel,
+  devops: DevOpsPanel,
   ml_inference: MLInferencingPanel,
   analytics: AnalyticsWorkbench,
   insights: InsightsEngineering,
@@ -208,9 +211,16 @@ export function DomainShell({
     ...DOMAIN_MODULES.filter((mod) => !ctx.domain.manifest.module_order.includes(mod.id)),
   ];
   const ActivePlatformPanel = PLATFORM_PANELS[moduleFromUrl];
-  const showScenarioControls = !["overview", "data_generation", "mlops", "ml_inference", "analytics", "insights"].includes(
-    moduleFromUrl
-  );
+  const showScenarioControls = ![
+    "overview",
+    "data_generation",
+    "mlops",
+    "infraops",
+    "devops",
+    "ml_inference",
+    "analytics",
+    "insights",
+  ].includes(moduleFromUrl);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#07090d]">

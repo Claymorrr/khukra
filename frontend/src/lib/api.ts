@@ -284,6 +284,33 @@ export function getPlatformSummary(): Promise<PlatformSummary> {
   return fetchJson("/platform/summary");
 }
 
+export interface OpsCheck {
+  label: string;
+  passed: boolean;
+}
+
+export interface OpsReadiness {
+  id: "infraops" | "devops" | "mlops" | string;
+  label: string;
+  status: string;
+  score: number;
+  description: string;
+  checks: OpsCheck[];
+}
+
+export interface OpsSummary {
+  domain: string;
+  capabilities: string[];
+  readiness: OpsReadiness[];
+  signals: Record<string, number>;
+  recent_jobs: Array<Record<string, unknown>>;
+  release: Record<string, string>;
+}
+
+export function getPlatformOpsSummary(domain: string): Promise<OpsSummary> {
+  return fetchJson(`/platform/ops/summary?domain=${encodeURIComponent(domain)}`);
+}
+
 export interface PlatformModuleManifest {
   id: string;
   label: string;

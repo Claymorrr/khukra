@@ -35,6 +35,7 @@ from khukra.services.insights import InsightsService
 from khukra.services.ml_inference import MLInferenceService
 from khukra.services.mlops_pipeline import MLOpsPipeline
 from khukra.services.mlops_templates import MLOpsTemplateService
+from khukra.services.ops import OpsService
 from khukra.services.platform_manifest import PlatformManifestService
 
 router = APIRouter(prefix="/platform")
@@ -43,6 +44,7 @@ _ml = MLInferenceService()
 _insights = InsightsService()
 _manifest = PlatformManifestService()
 _templates = MLOpsTemplateService()
+_ops = OpsService()
 
 
 @router.get("/manifest", response_model=PlatformManifestResponse)
@@ -87,6 +89,14 @@ def _to_inference_response(result: PredictionResult) -> InferenceResponse:
 def platform_summary(_user: dict = Depends(require_user)) -> PlatformSummaryResponse:
     data = _insights.platform_summary()
     return PlatformSummaryResponse(**data)
+
+
+@router.get("/ops/summary")
+def platform_ops_summary(
+    domain: str,
+    _user: dict = Depends(require_user),
+) -> dict[str, Any]:
+    return _ops.domain_summary(domain)
 
 
 def _parse_json_field(value: Any) -> dict[str, Any] | None:

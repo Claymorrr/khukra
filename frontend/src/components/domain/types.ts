@@ -9,6 +9,8 @@ export type DomainModule =
   | "data"
   | "data_generation"
   | "mlops"
+  | "infraops"
+  | "devops"
   | "ml_inference"
   | "analytics"
   | "insights";
@@ -24,6 +26,8 @@ export const DOMAIN_MODULES: Array<{ id: DomainModule; label: string }> = [
   { id: "data", label: "Datasets" },
   { id: "data_generation", label: "Data Generation" },
   { id: "mlops", label: "MLOps" },
+  { id: "infraops", label: "InfraOps" },
+  { id: "devops", label: "DevOps" },
   { id: "ml_inference", label: "ML Inferencing" },
   { id: "analytics", label: "Analytics" },
   { id: "insights", label: "Insights" },
