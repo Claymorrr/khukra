@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends
 
-from khukra.api.deps import require_user
+from khukra.auth.deps import require_user
 from khukra.api.schemas import (
     EntityVersionInfo,
     EntityVersionListResponse,
