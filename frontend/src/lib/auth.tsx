@@ -19,6 +19,8 @@ interface AuthContextValue {
   login: (token: string, user: UserInfo) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  /** False until localStorage has been read on the client (avoids SSR hydration mismatch). */
+  ready: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -26,11 +28,19 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserInfo | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setToken(localStorage.getItem(TOKEN_KEY));
     const raw = localStorage.getItem(USER_KEY);
-    if (raw) setUser(JSON.parse(raw));
+    if (raw) {
+      try {
+        setUser(JSON.parse(raw) as UserInfo);
+      } catch {
+        localStorage.removeItem(USER_KEY);
+      }
+    }
+    setReady(true);
   }, []);
 
   const login = useCallback((t: string, u: UserInfo) => {
@@ -54,8 +64,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       login,
       logout,
       isAuthenticated: !!token,
+      ready,
     }),
-    [user, token, login, logout]
+    [user, token, login, logout, ready]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

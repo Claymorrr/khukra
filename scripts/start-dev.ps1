@@ -6,6 +6,8 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$root'; .venv
 Start-Sleep -Seconds 2
 Set-Location "$root\frontend"
 if (-not (Test-Path node_modules)) { npm install }
+# Clear stale Next cache (prevents missing CSS/vendor-chunks in dev)
+Remove-Item -Recurse -Force "$root\frontend\.next" -ErrorAction SilentlyContinue
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$root\frontend'; npm run dev"
 Start-Sleep -Seconds 3
 Start-Process "http://localhost:3000"

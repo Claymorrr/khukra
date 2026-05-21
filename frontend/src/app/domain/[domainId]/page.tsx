@@ -2,13 +2,13 @@
 
 import { Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { AuthLoadingShell } from "@/components/AuthLoadingShell";
 import { LoginForm } from "@/components/LoginForm";
 import { DomainShell } from "@/components/domain/DomainShell";
 
 function DomainContent() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, ready } = useAuth();
   const params = useParams();
   const searchParams = useSearchParams();
   const domainId = typeof params.domainId === "string" ? params.domainId : "physical";
@@ -30,13 +30,7 @@ function DomainContent() {
 export default function DomainPage() {
   return (
     <AuthProvider>
-      <Suspense
-        fallback={
-          <div className="flex min-h-screen items-center justify-center bg-[#07090d]">
-            <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
-          </div>
-        }
-      >
+      <Suspense fallback={<AuthLoadingShell />}>
         <DomainContent />
       </Suspense>
     </AuthProvider>
