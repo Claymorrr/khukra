@@ -292,10 +292,19 @@ export interface PlatformModuleManifest {
   enabled: boolean;
 }
 
+export interface PlatformDomainManifest {
+  id: string;
+  label: string;
+  color: string;
+  icon: string;
+  order: number;
+}
+
 export interface PlatformManifest {
   version: string;
   workspace: string;
   feature_flags: Record<string, boolean>;
+  domains: PlatformDomainManifest[];
   modules: PlatformModuleManifest[];
 }
 

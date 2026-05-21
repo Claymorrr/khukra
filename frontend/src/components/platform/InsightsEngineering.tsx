@@ -13,9 +13,10 @@ import {
 
 interface InsightsEngineeringProps {
   accentColor: string;
+  domainId: string;
 }
 
-export function InsightsEngineering({ accentColor }: InsightsEngineeringProps) {
+export function InsightsEngineering({ accentColor, domainId }: InsightsEngineeringProps) {
   const [cards, setCards] = useState<InsightCard[]>([]);
   const [stats, setStats] = useState<Record<string, number>>({});
   const [artifacts, setArtifacts] = useState<Array<Record<string, unknown>>>([]);
@@ -58,7 +59,8 @@ export function InsightsEngineering({ accentColor }: InsightsEngineeringProps) {
           Insights engineering
         </p>
         <p className="mt-2 text-sm text-zinc-500">
-          Warehouse health, registry status, evaluation pass rates, and one-click ML readiness explanations.
+          Warehouse health, registry status, and ML readiness for domain{" "}
+          <span className="font-mono text-zinc-400">{domainId}</span>.
         </p>
       </section>
 

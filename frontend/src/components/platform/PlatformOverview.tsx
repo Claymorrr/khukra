@@ -3,14 +3,19 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { getPlatformManifest, getPlatformSummary, type PlatformSummary } from "@/lib/api";
-import type { PlatformModule } from "./PlatformShell";
-
 interface PlatformOverviewProps {
   accentColor: string;
-  onNavigate: (module: PlatformModule) => void;
+  domainId: string;
+  domainLabel: string;
+  onNavigate: (module: string) => void;
 }
 
-export function PlatformOverview({ accentColor, onNavigate }: PlatformOverviewProps) {
+export function PlatformOverview({
+  accentColor,
+  domainId,
+  domainLabel,
+  onNavigate,
+}: PlatformOverviewProps) {
   const [summary, setSummary] = useState<PlatformSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -36,9 +41,10 @@ export function PlatformOverview({ accentColor, onNavigate }: PlatformOverviewPr
           {summary?.headline ?? "Platform health snapshot"}
         </h3>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-          Separate workspace for synthetic data generation, MLOps orchestration, ML
-          inferencing, DuckDB analytics, and insights engineering — without the research model UI.
+          {domainLabel}: synthetic data generation, MLOps orchestration, ML inferencing,
+          DuckDB analytics, and insights scoped to this domain.
         </p>
+        <p className="mt-2 text-xs text-zinc-600">Active domain: {domainId}</p>
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -59,7 +65,7 @@ export function PlatformOverview({ accentColor, onNavigate }: PlatformOverviewPr
           <button
             key={mod.id}
             type="button"
-            onClick={() => onNavigate(mod.id as PlatformModule)}
+            onClick={() => onNavigate(mod.id)}
             className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-sky-500/30 hover:bg-sky-500/5"
           >
             <div>

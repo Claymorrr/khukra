@@ -26,6 +26,19 @@ Local-first research + platform workspaces, FastAPI, Next.js, DuckDB/Parquet, au
 
 ---
 
+## App navigation (done)
+
+Khukra is **domain-first** end-to-end:
+
+- `/` — choose domain (Physical, Finance, Supply Chain, Intelligence, Computing)
+- `/domain/<domainId>?module=<capability>` — unified workspace per domain
+- Capabilities in one shell: overview, inference, results, sweeps, compare, docs, history, datasets, data generation, MLOps, ML inferencing, analytics, insights
+- `/research` and `/platform` redirect to domain routes for compatibility
+
+**Aerodesign** is a Physical Systems subdomain (`aerodesign` / `aerodynamic_performance_forecast`).
+
+---
+
 ## Phase 1 — Deployment (next)
 
 Goal: a stable hosted environment suitable for demo and internal pilot.

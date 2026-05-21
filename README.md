@@ -109,6 +109,8 @@ khukra-run physical turbomachinery_degradation turbomachinery_health_forecast
 
 Use a [GitHub Project](https://github.com/Claymorrr/khukra/projects) board for Backlog / In progress / Done.
 
+**Domain-first app:** after login, choose a domain at `/`, then work in `/domain/physical?module=inference` (and other capabilities in the same domain shell). Legacy `/research` and `/platform` URLs redirect into domain routes. Aerodesign lives under Physical Systems.
+
 ## Project layout
 
 ```

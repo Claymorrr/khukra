@@ -5,7 +5,33 @@ import { getCatalog } from "@/lib/api";
 import type { CatalogResponse, ParameterSchema, Selection } from "@/lib/types";
 import { defaultParamValues, type DynamicParameterField } from "@/components/DynamicParameterForm";
 
-export function useCatalogSelection(initial?: Partial<Selection>) {
+function pickSelection(
+  domains: CatalogResponse["domains"],
+  initial?: Partial<Selection>,
+  lockDomain?: string
+): Selection | null {
+  const pool = lockDomain ? domains.filter((d) => d.id === lockDomain) : domains;
+  if (!pool.length) return null;
+
+  if (initial?.domainId && initial.subdomainId && initial.modelId) {
+    const domain = pool.find((d) => d.id === initial.domainId) ?? pool[0];
+    const subdomain =
+      domain.subdomains.find((s) => s.id === initial.subdomainId) ?? domain.subdomains[0];
+    const model =
+      subdomain?.models.find((m) => m.id === initial.modelId) ?? subdomain?.models[0];
+    if (subdomain && model) {
+      return { domainId: domain.id, subdomainId: subdomain.id, modelId: model.id };
+    }
+  }
+
+  const d = pool[0];
+  const s = d.subdomains[0];
+  const m = s?.models[0];
+  if (!s || !m) return null;
+  return { domainId: d.id, subdomainId: s.id, modelId: m.id };
+}
+
+export function useCatalogSelection(initial?: Partial<Selection>, lockDomain?: string) {
   const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [paramValues, setParamValues] = useState<Record<string, string | number | boolean>>({});
@@ -16,22 +42,19 @@ export function useCatalogSelection(initial?: Partial<Selection>) {
     getCatalog()
       .then((data) => {
         setCatalog(data);
-        if (initial?.domainId && initial.subdomainId && initial.modelId) {
-          setSelection({
-            domainId: initial.domainId,
-            subdomainId: initial.subdomainId,
-            modelId: initial.modelId,
-          });
-        } else {
-          const d = data.domains[0];
-          const s = d.subdomains[0];
-          const m = s.models[0];
-          setSelection({ domainId: d.id, subdomainId: s.id, modelId: m.id });
-        }
+        setSelection(pickSelection(data.domains, initial, lockDomain));
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load catalog"))
       .finally(() => setLoading(false));
-  }, [initial?.domainId, initial?.modelId, initial?.subdomainId]);
+  }, [initial?.domainId, initial?.modelId, initial?.subdomainId, lockDomain]);
+
+  useEffect(() => {
+    if (!catalog || !lockDomain) return;
+    setSelection((prev) => {
+      if (prev?.domainId === lockDomain) return prev;
+      return pickSelection(catalog.domains, { domainId: lockDomain }, lockDomain);
+    });
+  }, [catalog, lockDomain]);
 
   const ctx = useMemo(() => {
     if (!catalog || !selection) return null;

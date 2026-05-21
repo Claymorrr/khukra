@@ -1,39 +1,44 @@
 "use client";
 
-import { Suspense } from "react";
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { PlatformShell } from "@/components/platform/PlatformShell";
-import { AuthProvider, useAuth } from "@/lib/auth";
-import { LoginForm } from "@/components/LoginForm";
+import { Suspense } from "react";
+import type { DomainModule } from "@/components/domain/types";
+import { domainPath } from "@/components/domain/types";
 
-function PlatformContent() {
-  const { isAuthenticated } = useAuth();
+function PlatformRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const module = searchParams.get("module") ?? undefined;
+  const domain = searchParams.get("domain") ?? "physical";
+  const module = (searchParams.get("module") ?? "overview") as DomainModule;
+  const subdomain = searchParams.get("subdomain");
+  const model = searchParams.get("model");
 
-  if (!isAuthenticated) return <LoginForm />;
+  useEffect(() => {
+    const extra: Record<string, string> = {};
+    if (subdomain) extra.subdomain = subdomain;
+    if (model) extra.model = model;
+    router.replace(domainPath(domain, module, Object.keys(extra).length ? extra : undefined));
+  }, [router, domain, module, subdomain, model]);
+
   return (
-    <PlatformShell
-      initialModule={module ?? undefined}
-      onSwitchToResearch={() => router.push("/research")}
-    />
+    <div className="flex min-h-screen items-center justify-center bg-[#07090d]">
+      <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
+    </div>
   );
 }
 
-export default function PlatformPage() {
+export default function PlatformRedirectPage() {
   return (
-    <AuthProvider>
-      <Suspense
-        fallback={
-          <div className="flex min-h-screen items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
-          </div>
-        }
-      >
-        <PlatformContent />
-      </Suspense>
-    </AuthProvider>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#07090d]">
+          <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
+        </div>
+      }
+    >
+      <PlatformRedirect />
+    </Suspense>
   );
 }

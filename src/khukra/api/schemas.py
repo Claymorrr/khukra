@@ -270,10 +270,19 @@ class PlatformModuleManifest(BaseModel):
     enabled: bool = True
 
 
+class PlatformDomainManifest(BaseModel):
+    id: str
+    label: str
+    color: str = "#38bdf8"
+    icon: str = "box"
+    order: int = 0
+
+
 class PlatformManifestResponse(BaseModel):
     version: str
     workspace: str
     feature_flags: dict[str, bool] = Field(default_factory=dict)
+    domains: list[PlatformDomainManifest] = Field(default_factory=list)
     modules: list[PlatformModuleManifest]
 
 

@@ -18,9 +18,10 @@ import { useCatalogSelection } from "@/hooks/useCatalogSelection";
 
 interface PlatformMLOpsPanelProps {
   accentColor: string;
+  domainId: string;
 }
 
-export function PlatformMLOpsPanel({ accentColor }: PlatformMLOpsPanelProps) {
+export function PlatformMLOpsPanel({ accentColor, domainId }: PlatformMLOpsPanelProps) {
   const {
     catalog,
     selection,
@@ -30,7 +31,7 @@ export function PlatformMLOpsPanel({ accentColor }: PlatformMLOpsPanelProps) {
     ctx,
     parameters,
     loading: catalogLoading,
-  } = useCatalogSelection();
+  } = useCatalogSelection(undefined, domainId);
   const [templates, setTemplates] = useState<PipelineTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState("full_pipeline");
   const [stats, setStats] = useState<Record<string, number>>({});
@@ -129,7 +130,12 @@ export function PlatformMLOpsPanel({ accentColor }: PlatformMLOpsPanelProps) {
           </p>
         )}
         <div className="mt-4">
-          <CatalogSelectors catalog={catalog} selection={selection} onSelectionChange={setSelection} />
+          <CatalogSelectors
+            catalog={catalog}
+            selection={selection}
+            onSelectionChange={setSelection}
+            lockDomain={domainId}
+          />
         </div>
         <div className="mt-6">
           <DynamicParameterForm

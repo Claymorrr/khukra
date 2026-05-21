@@ -3,6 +3,7 @@ from typing import Any
 from fastapi import APIRouter
 
 from khukra.api.schemas import CatalogResponse, DomainInfo, ModelInfo, ParameterSchema, SubdomainInfo
+from khukra.domains.meta import DOMAIN_META
 from khukra.services.parameter_metadata import enrich_parameter
 from khukra.domains.registry import (
     list_domains,
@@ -12,14 +13,6 @@ from khukra.domains.registry import (
 )
 
 router = APIRouter()
-
-DOMAIN_META = {
-    "physical": {"label": "Physical Systems — Propulsion Research", "color": "#38bdf8"},
-    "finance": {"label": "Finance — Quantitative Research", "color": "#34d399"},
-    "supply_chain": {"label": "Supply Chain — Quality & Disruptions", "color": "#fbbf24"},
-    "intelligence": {"label": "Intelligence — Computational Modeling Systems", "color": "#a78bfa"},
-    "computing": {"label": "Computing — Computational Modeling Systems", "color": "#f472b6"},
-}
 
 
 def _infer_type(value: Any) -> str:

@@ -45,3 +45,4 @@ data/warehouse/
 data/datasets/
 data/exports/
 !data/.gitkeep
+frontend/data/

@@ -1,25 +1,20 @@
 "use client";
 
-import { Suspense } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Dashboard } from "@/components/Dashboard";
-import { AuthProvider } from "@/lib/auth";
-import { LoginForm } from "@/components/LoginForm";
-import { useAuth } from "@/lib/auth";
+import { Loader2 } from "lucide-react";
+import { domainPath } from "@/components/domain/types";
 
-function ResearchContent() {
-  const { isAuthenticated } = useAuth();
+export default function ResearchRedirectPage() {
   const router = useRouter();
-  if (!isAuthenticated) return <LoginForm />;
-  return <Dashboard onSwitchToPlatform={() => router.push("/platform")} />;
-}
 
-export default function ResearchPage() {
+  useEffect(() => {
+    router.replace(domainPath("physical", "inference"));
+  }, [router]);
+
   return (
-    <AuthProvider>
-      <Suspense fallback={null}>
-        <ResearchContent />
-      </Suspense>
-    </AuthProvider>
+    <div className="flex min-h-screen items-center justify-center bg-[#07090d]">
+      <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
+    </div>
   );
 }

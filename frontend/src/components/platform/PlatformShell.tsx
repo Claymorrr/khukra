@@ -5,16 +5,24 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   BarChart3,
+  Box,
   Brain,
+  BrainCircuit,
+  Cpu,
   Database,
   LayoutDashboard,
-  LogOut,
-  BrainCircuit,
-  Sparkles,
-  Workflow,
+  LineChart,
   Loader2,
+  LogOut,
+  Sparkles,
+  Truck,
+  Workflow,
 } from "lucide-react";
-import { getPlatformManifest, type PlatformModuleManifest } from "@/lib/api";
+import {
+  getPlatformManifest,
+  type PlatformDomainManifest,
+  type PlatformModuleManifest,
+} from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { PlatformOverview } from "./PlatformOverview";
 import { DataGenerationStudio } from "./DataGenerationStudio";
@@ -31,7 +39,15 @@ export type PlatformModule =
   | "analytics"
   | "insights";
 
-const FALLBACK_NAV: PlatformModuleManifest[] = [
+const FALLBACK_DOMAINS: PlatformDomainManifest[] = [
+  { id: "physical", label: "Physical Systems", color: "#38bdf8", icon: "box", order: 0 },
+  { id: "finance", label: "Finance", color: "#34d399", icon: "line-chart", order: 1 },
+  { id: "supply_chain", label: "Supply Chain", color: "#fbbf24", icon: "truck", order: 2 },
+  { id: "intelligence", label: "Intelligence", color: "#a78bfa", icon: "brain", order: 3 },
+  { id: "computing", label: "Computing", color: "#f472b6", icon: "cpu", order: 4 },
+];
+
+const FALLBACK_MODULES: PlatformModuleManifest[] = [
   { id: "overview", label: "Overview", description: "", route_id: "overview", icon: "layout-dashboard", order: 0, capabilities: [], actions: [], required_roles: [], enabled: true },
   { id: "data_generation", label: "Data Generation", description: "", route_id: "data_generation", icon: "database", order: 1, capabilities: [], actions: [], required_roles: [], enabled: true },
   { id: "mlops", label: "MLOps", description: "", route_id: "mlops", icon: "workflow", order: 2, capabilities: [], actions: [], required_roles: [], enabled: true },
@@ -40,7 +56,15 @@ const FALLBACK_NAV: PlatformModuleManifest[] = [
   { id: "insights", label: "Insights", description: "", route_id: "insights", icon: "brain", order: 5, capabilities: [], actions: [], required_roles: [], enabled: true },
 ];
 
-const ICON_MAP: Record<string, typeof Database> = {
+const DOMAIN_ICON_MAP: Record<string, typeof Box> = {
+  box: Box,
+  "line-chart": LineChart,
+  truck: Truck,
+  brain: Brain,
+  cpu: Cpu,
+};
+
+const MODULE_ICON_MAP: Record<string, typeof Database> = {
   "layout-dashboard": LayoutDashboard,
   database: Database,
   workflow: Workflow,
@@ -49,7 +73,9 @@ const ICON_MAP: Record<string, typeof Database> = {
   brain: Brain,
 };
 
-const MODULE_COMPONENTS: Partial<Record<PlatformModule, ComponentType<{ accentColor: string }>>> = {
+type ModulePanelProps = { accentColor: string; domainId: string };
+
+const MODULE_COMPONENTS: Partial<Record<PlatformModule, ComponentType<ModulePanelProps>>> = {
   data_generation: DataGenerationStudio,
   mlops: PlatformMLOpsPanel,
   ml_inference: MLInferencingPanel,
@@ -57,44 +83,74 @@ const MODULE_COMPONENTS: Partial<Record<PlatformModule, ComponentType<{ accentCo
   insights: InsightsEngineering,
 };
 
-const ACCENT = "#38bdf8";
-
 interface PlatformShellProps {
   onSwitchToResearch: () => void;
   initialModule?: string;
+  initialDomain?: string;
 }
 
-export function PlatformShell({ onSwitchToResearch, initialModule }: PlatformShellProps) {
+export function PlatformShell({
+  onSwitchToResearch,
+  initialModule,
+  initialDomain,
+}: PlatformShellProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [manifestModules, setManifestModules] = useState<PlatformModuleManifest[]>(FALLBACK_NAV);
+  const [manifestDomains, setManifestDomains] = useState<PlatformDomainManifest[]>(FALLBACK_DOMAINS);
+  const [manifestModules, setManifestModules] = useState<PlatformModuleManifest[]>(FALLBACK_MODULES);
   const [manifestLoading, setManifestLoading] = useState(true);
 
+  const domainFromUrl =
+    searchParams.get("domain") ?? initialDomain ?? manifestDomains[0]?.id ?? "physical";
   const moduleFromUrl = (searchParams.get("module") ?? initialModule ?? "overview") as PlatformModule;
 
-  const setModule = useCallback(
-    (id: PlatformModule) => {
+  const updateUrl = useCallback(
+    (domain: string, module: PlatformModule) => {
       const params = new URLSearchParams(searchParams.toString());
-      params.set("module", id);
+      params.set("domain", domain);
+      params.set("module", module);
       router.replace(`/platform?${params.toString()}`);
     },
     [router, searchParams]
   );
 
+  const setDomain = useCallback(
+    (id: string) => updateUrl(id, moduleFromUrl),
+    [moduleFromUrl, updateUrl]
+  );
+
+  const setModule = useCallback(
+    (id: PlatformModule) => updateUrl(domainFromUrl, id),
+    [domainFromUrl, updateUrl]
+  );
+
   useEffect(() => {
     getPlatformManifest()
-      .then((m) => setManifestModules(m.modules.length ? m.modules : FALLBACK_NAV))
-      .catch(() => setManifestModules(FALLBACK_NAV))
+      .then((m) => {
+        setManifestDomains(m.domains?.length ? m.domains : FALLBACK_DOMAINS);
+        setManifestModules(m.modules.length ? m.modules : FALLBACK_MODULES);
+      })
+      .catch(() => {
+        setManifestDomains(FALLBACK_DOMAINS);
+        setManifestModules(FALLBACK_MODULES);
+      })
       .finally(() => setManifestLoading(false));
   }, []);
 
-  const nav = useMemo(
+  const domains = useMemo(
+    () => [...manifestDomains].sort((a, b) => a.order - b.order),
+    [manifestDomains]
+  );
+
+  const modules = useMemo(
     () => [...manifestModules].sort((a, b) => a.order - b.order),
     [manifestModules]
   );
 
-  const active = nav.find((n) => n.id === moduleFromUrl) ?? nav[0];
+  const activeDomain = domains.find((d) => d.id === domainFromUrl) ?? domains[0];
+  const activeModule = modules.find((m) => m.id === moduleFromUrl) ?? modules[0];
+  const accent = activeDomain?.color ?? "#38bdf8";
   const ActiveModule = MODULE_COMPONENTS[moduleFromUrl as PlatformModule];
 
   return (
@@ -105,9 +161,9 @@ export function PlatformShell({ onSwitchToResearch, initialModule }: PlatformShe
             <Sparkles className="h-4 w-4 text-sky-400" />
             Khukra Platform
           </p>
-          <h1 className="mt-2 text-lg font-semibold text-white">Data & MLOps</h1>
+          <h1 className="mt-2 text-lg font-semibold text-white">By domain</h1>
           <p className="mt-1 text-xs leading-5 text-zinc-600">
-            Metadata-driven modules from platform manifest.
+            Data, MLOps, inference, analytics, and insights per domain.
           </p>
         </div>
         <nav className="flex-1 space-y-1 p-3">
@@ -116,23 +172,23 @@ export function PlatformShell({ onSwitchToResearch, initialModule }: PlatformShe
               <Loader2 className="h-5 w-5 animate-spin text-zinc-600" />
             </div>
           ) : (
-            nav.map((item) => {
-              const Icon = ICON_MAP[item.icon] ?? Database;
-              const id = item.id as PlatformModule;
+            domains.map((item) => {
+              const Icon = DOMAIN_ICON_MAP[item.icon] ?? Box;
+              const isActive = domainFromUrl === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setModule(id)}
+                  onClick={() => setDomain(item.id)}
                   className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
-                    moduleFromUrl === id
-                      ? "bg-sky-500/15 font-medium text-sky-200"
+                    isActive
+                      ? "bg-white/10 font-medium text-white"
                       : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
                   }`}
-                  title={item.description}
+                  style={isActive ? { boxShadow: `inset 3px 0 0 ${item.color}` } : undefined}
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  {item.label}
+                  <Icon className="h-4 w-4 shrink-0" style={{ color: item.color }} />
+                  <span className="truncate text-left">{item.label}</span>
                 </button>
               );
             })
@@ -163,18 +219,54 @@ export function PlatformShell({ onSwitchToResearch, initialModule }: PlatformShe
       <main className="scrollbar-thin flex min-w-0 flex-1 flex-col overflow-y-auto">
         <header className="sticky top-0 z-10 border-b border-white/10 bg-[#07090d]/90 px-8 py-5 backdrop-blur-xl">
           <p className="text-xs font-medium uppercase tracking-[0.28em] text-zinc-500">
-            Platform workspace
+            {activeDomain?.label ?? "Platform"}
           </p>
-          <h2 className="mt-1 text-2xl font-semibold text-white">{active?.label}</h2>
-          {active?.description && (
-            <p className="mt-1 max-w-3xl text-sm text-zinc-600">{active.description}</p>
+          <h2 className="mt-1 text-2xl font-semibold text-white">
+            {activeModule?.label ?? "Overview"}
+          </h2>
+          {activeModule?.description && (
+            <p className="mt-1 max-w-3xl text-sm text-zinc-600">{activeModule.description}</p>
           )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {modules.map((item) => {
+              const Icon = MODULE_ICON_MAP[item.icon] ?? Database;
+              const id = item.id as PlatformModule;
+              const isActive = moduleFromUrl === id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setModule(id)}
+                  className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs transition ${
+                    isActive
+                      ? "font-medium text-white"
+                      : "border border-white/10 text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                  }`}
+                  style={
+                    isActive
+                      ? { backgroundColor: `${accent}22`, borderColor: `${accent}55`, color: accent }
+                      : undefined
+                  }
+                >
+                  <Icon className="h-3.5 w-3.5 shrink-0" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
         </header>
         <div className="px-8 py-6">
-          {moduleFromUrl === "overview" && (
-            <PlatformOverview accentColor={ACCENT} onNavigate={setModule} />
+          {moduleFromUrl === "overview" && activeDomain && (
+            <PlatformOverview
+              accentColor={accent}
+              domainId={activeDomain.id}
+              domainLabel={activeDomain.label}
+              onNavigate={(m) => setModule(m as PlatformModule)}
+            />
           )}
-          {moduleFromUrl !== "overview" && ActiveModule && <ActiveModule accentColor={ACCENT} />}
+          {moduleFromUrl !== "overview" && ActiveModule && activeDomain && (
+            <ActiveModule accentColor={accent} domainId={activeDomain.id} />
+          )}
           {moduleFromUrl !== "overview" && !ActiveModule && (
             <p className="text-sm text-zinc-500">Unknown module: {moduleFromUrl}</p>
           )}

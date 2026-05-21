@@ -12,12 +12,13 @@ import { useCatalogSelection } from "@/hooks/useCatalogSelection";
 
 interface MLInferencingPanelProps {
   accentColor: string;
+  domainId: string;
 }
 
-export function MLInferencingPanel({ accentColor }: MLInferencingPanelProps) {
+export function MLInferencingPanel({ accentColor, domainId }: MLInferencingPanelProps) {
   const searchParams = useSearchParams();
   const initial = {
-    domainId: searchParams.get("domain") ?? undefined,
+    domainId: searchParams.get("domain") ?? domainId,
     subdomainId: searchParams.get("subdomain") ?? undefined,
     modelId: searchParams.get("model") ?? undefined,
   };
@@ -32,7 +33,8 @@ export function MLInferencingPanel({ accentColor }: MLInferencingPanelProps) {
     loading: catalogLoading,
     error: catalogError,
   } = useCatalogSelection(
-    initial.domainId && initial.subdomainId && initial.modelId ? initial : undefined
+    initial.domainId && initial.subdomainId && initial.modelId ? initial : undefined,
+    domainId
   );
   const [modelCount, setModelCount] = useState(0);
   const [mlSchema, setMlSchema] = useState<DynamicParameterField[] | null>(null);
@@ -42,9 +44,9 @@ export function MLInferencingPanel({ accentColor }: MLInferencingPanelProps) {
 
   useEffect(() => {
     getPlatformMLModels()
-      .then((r) => setModelCount(r.models.length))
+      .then((r) => setModelCount(r.models.filter((m) => m.domain === domainId).length))
       .catch(() => setModelCount(0));
-  }, []);
+  }, [domainId]);
 
   useEffect(() => {
     if (!selection) return;
@@ -108,7 +110,12 @@ export function MLInferencingPanel({ accentColor }: MLInferencingPanelProps) {
           <BrainCircuit className="h-4 w-4" style={{ color: accentColor }} />
           ML inferencing
         </p>
-        <CatalogSelectors catalog={catalog} selection={selection} onSelectionChange={setSelection} />
+        <CatalogSelectors
+          catalog={catalog}
+          selection={selection}
+          onSelectionChange={setSelection}
+          lockDomain={domainId}
+        />
         <div className="mt-6">
           <DynamicParameterForm
             parameters={formParams}

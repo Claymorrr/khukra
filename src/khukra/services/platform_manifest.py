@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from khukra.domains.meta import DOMAIN_ICONS, DOMAIN_META
+from khukra.domains.registry import list_domains
+
 PLATFORM_MODULES: list[dict[str, Any]] = [
     {
         "id": "overview",
@@ -92,15 +95,32 @@ PLATFORM_MODULES: list[dict[str, Any]] = [
 
 
 class PlatformManifestService:
+    def _build_domains(self) -> list[dict[str, Any]]:
+        domains: list[dict[str, Any]] = []
+        for order, domain_id in enumerate(list_domains()):
+            meta = DOMAIN_META[domain_id]
+            domains.append(
+                {
+                    "id": domain_id,
+                    "label": meta["label"],
+                    "color": meta["color"],
+                    "icon": DOMAIN_ICONS.get(domain_id, "box"),
+                    "order": order,
+                }
+            )
+        return domains
+
     def build(self) -> dict[str, Any]:
         return {
             "version": "1.0",
             "workspace": "platform",
             "feature_flags": {
                 "dynamic_navigation": True,
+                "domain_first_navigation": True,
                 "dynamic_forms": True,
                 "dataset_to_inference": True,
                 "pipeline_templates": True,
             },
+            "domains": self._build_domains(),
             "modules": [m for m in PLATFORM_MODULES if m.get("enabled", True)],
         }

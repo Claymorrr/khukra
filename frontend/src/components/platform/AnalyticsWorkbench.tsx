@@ -11,16 +11,20 @@ import {
 
 interface AnalyticsWorkbenchProps {
   accentColor: string;
+  domainId: string;
 }
 
-const DEFAULT_SQL = `SELECT dataset_id, scenario_id, domain, subdomain, model_id, file_uri, row_count
+function domainSql(domainId: string) {
+  return `SELECT dataset_id, scenario_id, domain, subdomain, model_id, file_uri, row_count
 FROM synthetic_datasets
+WHERE domain = '${domainId}'
 ORDER BY created_at DESC
 LIMIT 20`;
+}
 
-export function AnalyticsWorkbench({ accentColor }: AnalyticsWorkbenchProps) {
+export function AnalyticsWorkbench({ accentColor, domainId }: AnalyticsWorkbenchProps) {
   const [catalog, setCatalog] = useState<QueryCatalog | null>(null);
-  const [sql, setSql] = useState(DEFAULT_SQL);
+  const [sql, setSql] = useState(() => domainSql(domainId));
   const [limit, setLimit] = useState(100);
   const [result, setResult] = useState<QueryResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,6 +33,10 @@ export function AnalyticsWorkbench({ accentColor }: AnalyticsWorkbenchProps) {
   useEffect(() => {
     getPlatformAnalyticsCatalog().then(setCatalog).catch(() => setCatalog(null));
   }, []);
+
+  useEffect(() => {
+    setSql(domainSql(domainId));
+  }, [domainId]);
 
   const visibleTables = useMemo(() => catalog?.tables.slice(0, 12) ?? [], [catalog]);
 

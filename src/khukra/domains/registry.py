@@ -13,6 +13,7 @@ from khukra.domains.intelligence.research import (
     InfluenceDynamics,
     SignalFusion,
 )
+from khukra.domains.physical.aerodesign import AerodesignPerformance
 from khukra.domains.physical.propulsion import (
     CombustionStability,
     HybridPropulsionControl,
@@ -26,6 +27,7 @@ from khukra.domains.supply_chain.resilience import (
 
 SUBDOMAIN_LABELS: dict[str, dict[str, str]] = {
     "physical": {
+        "aerodesign": "Aerodesign — aerodynamic performance, stability, and design tradeoffs",
         "turbomachinery_degradation": "Turbomachinery degradation — compressor/turbine health forecasting",
         "combustion_stability": "Combustion stability — instability, emissions, flame dynamics",
         "hybrid_propulsion_control": "Hybrid propulsion — electric/thermal mission-state forecasting",
@@ -54,6 +56,9 @@ SUBDOMAIN_LABELS: dict[str, dict[str, str]] = {
 
 DOMAINS: dict[str, dict[str, dict[str, type]]] = {
     "physical": {
+        "aerodesign": {
+            "aerodynamic_performance_forecast": AerodesignPerformance,
+        },
         "turbomachinery_degradation": {
             "turbomachinery_health_forecast": TurbomachineryDegradation,
         },

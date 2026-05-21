@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { domainPath } from "@/components/domain/types";
 import { Database, Loader2, Play, Rows3 } from "lucide-react";
 import {
   listSyntheticDatasets,
@@ -15,9 +16,10 @@ import { useCatalogSelection } from "@/hooks/useCatalogSelection";
 
 interface DataGenerationStudioProps {
   accentColor: string;
+  domainId: string;
 }
 
-export function DataGenerationStudio({ accentColor }: DataGenerationStudioProps) {
+export function DataGenerationStudio({ accentColor, domainId }: DataGenerationStudioProps) {
   const router = useRouter();
   const {
     catalog,
@@ -29,7 +31,7 @@ export function DataGenerationStudio({ accentColor }: DataGenerationStudioProps)
     parameters,
     loading: catalogLoading,
     error: catalogError,
-  } = useCatalogSelection();
+  } = useCatalogSelection(undefined, domainId);
   const [datasets, setDatasets] = useState<DatasetCatalogItem[]>([]);
   const [lastResult, setLastResult] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
@@ -69,13 +71,12 @@ export function DataGenerationStudio({ accentColor }: DataGenerationStudioProps)
     const action = ds.actions?.find((a) => a.id === actionId);
     if (!action) return;
     if (actionId === "send_to_ml_inference" && action.domain && action.subdomain && action.model) {
-      const params = new URLSearchParams({
-        module: "ml_inference",
-        domain: action.domain,
-        subdomain: action.subdomain,
-        model: action.model,
-      });
-      router.push(`/platform?${params.toString()}`);
+      router.push(
+        domainPath(action.domain ?? domainId, "ml_inference", {
+          subdomain: action.subdomain,
+          model: action.model,
+        })
+      );
       return;
     }
     if (actionId === "preview_sql" && action.sql) {
@@ -100,6 +101,7 @@ export function DataGenerationStudio({ accentColor }: DataGenerationStudioProps)
     );
   }
 
+  const domainDatasets = datasets.filter((row) => !row.domain || row.domain === domainId);
   const schemaCols = selectedDataset?.column_schema
     ? Object.entries(selectedDataset.column_schema)
     : [];
@@ -111,7 +113,12 @@ export function DataGenerationStudio({ accentColor }: DataGenerationStudioProps)
           <Database className="h-4 w-4" style={{ color: accentColor }} />
           Data Generation Studio
         </p>
-        <CatalogSelectors catalog={catalog} selection={selection} onSelectionChange={setSelection} />
+        <CatalogSelectors
+          catalog={catalog}
+          selection={selection}
+          onSelectionChange={setSelection}
+          lockDomain={domainId}
+        />
         <div className="mt-6">
           <DynamicParameterForm
             parameters={parameters}
@@ -165,7 +172,7 @@ export function DataGenerationStudio({ accentColor }: DataGenerationStudioProps)
               </tr>
             </thead>
             <tbody>
-              {datasets.map((row) => (
+              {domainDatasets.map((row) => (
                 <tr key={row.dataset_id} className="border-b border-white/5">
                   <td className="py-2 pr-4 font-mono text-zinc-400">{row.dataset_id}</td>
                   <td className="py-2 pr-4">{row.domain}</td>
