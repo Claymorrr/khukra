@@ -25,6 +25,8 @@ export interface SubdomainInfo {
 }
 
 export interface DomainManifestInfo {
+  entity_id?: string;
+  version?: string;
   tagline: string;
   positioning: string;
   primary_focus: string[];
@@ -33,6 +35,14 @@ export interface DomainManifestInfo {
   ops_capabilities: string[];
   module_order: string[];
   roadmap: string[];
+}
+
+export interface VersioningSummary {
+  app_release: string;
+  catalog_schema_version: string;
+  total_versions: number;
+  entity_counts: Record<string, number>;
+  compatibility_policy: Record<string, string>;
 }
 
 export interface DomainInfo {
@@ -44,6 +54,7 @@ export interface DomainInfo {
 }
 
 export interface CatalogResponse {
+  schema_version?: string;
   domains: DomainInfo[];
 }
 

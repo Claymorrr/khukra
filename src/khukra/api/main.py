@@ -15,13 +15,16 @@ from khukra.api.routes import (
     lineage_router,
     platform_router,
     query_router,
+    versioning_router,
     registry_router,
     runs_router,
     stats_router,
     sweeps_router,
     synthetic_router,
+    versioning_router,
 )
 from khukra.services.bootstrap import ensure_default_admin
+from khukra.versioning.bootstrap import ensure_domain_manifest_versions
 
 api = APIRouter(prefix="/api")
 api.include_router(catalog_router)
@@ -40,6 +43,7 @@ api.include_router(query_router)
 api.include_router(auth_router)
 api.include_router(stats_router)
 api.include_router(platform_router)
+api.include_router(versioning_router)
 
 
 @api.get("/health")
@@ -50,6 +54,7 @@ def health() -> dict[str, str]:
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     ensure_default_admin()
+    ensure_domain_manifest_versions()
     yield
 
 

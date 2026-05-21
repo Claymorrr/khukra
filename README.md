@@ -106,6 +106,7 @@ khukra-run physical turbomachinery_degradation turbomachinery_health_forecast
 | Doc | Purpose |
 |-----|---------|
 | [docs/roadmap.md](docs/roadmap.md) | Phases: deployment → hardening → features |
+| [docs/versioning.md](docs/versioning.md) | Entity IDs, version labels, lineage, compatibility |
 | [docs/deployment-plan.md](docs/deployment-plan.md) | Go-live checklist and env vars |
 | [GitHub Issues](https://github.com/Claymorrr/khukra/issues) | Actionable tasks (label: `deployment`, `feature`, …) |
 

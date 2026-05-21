@@ -39,7 +39,11 @@ Khukra is **domain-first** end-to-end:
 
 ---
 
-## Domain Manifest Architecture (in progress)
+## Domain Manifest Architecture (done)
+
+See [versioning.md](./versioning.md) for entity IDs, version labels, lineage metadata, and compatibility policy.
+
+## Versioning architecture (done — #28)
 
 Each domain carries manifest metadata that shapes how it appears and how future features are organized:
 

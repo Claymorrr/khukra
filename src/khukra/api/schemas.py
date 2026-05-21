@@ -30,6 +30,8 @@ class SubdomainInfo(BaseModel):
 
 
 class DomainManifestInfo(BaseModel):
+    entity_id: str = ""
+    version: str = "1.0.0"
     tagline: str = ""
     positioning: str = ""
     primary_focus: list[str] = Field(default_factory=list)
@@ -38,6 +40,33 @@ class DomainManifestInfo(BaseModel):
     ops_capabilities: list[str] = Field(default_factory=list)
     module_order: list[str] = Field(default_factory=list)
     roadmap: list[str] = Field(default_factory=list)
+
+
+class EntityVersionInfo(BaseModel):
+    version_id: str
+    entity_type: str
+    entity_id: str
+    version_label: str
+    status: str = "active"
+    content_hash: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    parent_version_id: str | None = None
+    created_at: Any = None
+
+
+class EntityVersionListResponse(BaseModel):
+    entity_type: str
+    entity_id: str
+    latest: EntityVersionInfo | None = None
+    versions: list[EntityVersionInfo] = Field(default_factory=list)
+
+
+class VersioningSummaryResponse(BaseModel):
+    app_release: str
+    catalog_schema_version: str
+    total_versions: int
+    entity_counts: dict[str, int] = Field(default_factory=dict)
+    compatibility_policy: dict[str, str] = Field(default_factory=dict)
 
 
 class DomainInfo(BaseModel):
@@ -49,6 +78,7 @@ class DomainInfo(BaseModel):
 
 
 class CatalogResponse(BaseModel):
+    schema_version: str = "1.0"
     domains: list[DomainInfo]
 
 

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from khukra.data.engine import DataEngine, get_engine
+from khukra.versioning.service import get_version_registry
 
 
 class ArtifactRepository:
@@ -50,6 +51,14 @@ class ArtifactRepository:
                     user_id,
                 ],
             )
+        registry = get_version_registry()
+        registry.register(
+            "model_artifact",
+            f"{domain}:{subdomain}:{model_id}",
+            version,
+            metadata={"artifact_id": artifact_id, "stage": stage},
+            content_hash=registry.content_hash(metrics),
+        )
         return artifact_id
 
     def list_artifacts(self, domain: str | None = None, limit: int = 50) -> list[dict[str, Any]]:

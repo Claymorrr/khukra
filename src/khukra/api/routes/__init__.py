@@ -30,6 +30,8 @@ from khukra.api.routes.platform import router as platform_router
 
 from khukra.api.routes.synthetic import router as synthetic_router
 
+from khukra.api.routes.versioning import router as versioning_router
+
 
 
 __all__ = [
@@ -65,6 +67,8 @@ __all__ = [
     "stats_router",
 
     "platform_router",
+
+    "versioning_router",
 
 ]
 

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
-import { getPlatformSummary, type PlatformSummary } from "@/lib/api";
+import { getPlatformSummary, getVersioningSummary, type PlatformSummary } from "@/lib/api";
+import type { VersioningSummary } from "@/lib/types";
 import type { DomainInfo } from "@/lib/types";
 import type { DomainModule } from "./types";
 import { DOMAIN_MODULES } from "./types";
@@ -30,12 +31,18 @@ export function DomainOverview({
   onNavigate,
 }: DomainOverviewProps) {
   const [summary, setSummary] = useState<PlatformSummary | null>(null);
+  const [versioning, setVersioning] = useState<VersioningSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getPlatformSummary()
-      .then(setSummary)
-      .catch(() => setSummary(null))
+    Promise.all([
+      getPlatformSummary().catch(() => null),
+      getVersioningSummary().catch(() => null),
+    ])
+      .then(([platform, versions]) => {
+        setSummary(platform);
+        setVersioning(versions);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -59,7 +66,22 @@ export function DomainOverview({
         <p className="text-xs uppercase tracking-[0.28em] text-zinc-600">
           {manifest.tagline || "Domain operating environment"}
         </p>
-        <h3 className="mt-3 text-3xl font-semibold tracking-tight text-white">{domain.label}</h3>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <h3 className="text-3xl font-semibold tracking-tight text-white">{domain.label}</h3>
+          {(manifest.version || manifest.entity_id) && (
+            <span
+              className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400"
+              style={{ borderColor: `${accentColor}44` }}
+              title={
+                versioning
+                  ? `Catalog schema ${versioning.catalog_schema_version} · App ${versioning.app_release}`
+                  : undefined
+              }
+            >
+              {manifest.entity_id || domain.id} · v{manifest.version || "1.0.0"}
+            </span>
+          )}
+        </div>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500">
           {manifest.positioning ||
             "Domain-specific inference, data operations, MLOps, analytics, and insight workflows."}

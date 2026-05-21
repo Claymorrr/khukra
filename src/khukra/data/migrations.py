@@ -238,6 +238,27 @@ MIGRATIONS: list[tuple[int, str]] = [
         CREATE INDEX IF NOT EXISTS idx_artifacts_model ON model_artifacts(model_id);
         """,
     ),
+    (
+        4,
+        """
+        CREATE TABLE IF NOT EXISTS entity_versions (
+            version_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            entity_type VARCHAR NOT NULL,
+            entity_id VARCHAR NOT NULL,
+            version_label VARCHAR NOT NULL,
+            status VARCHAR DEFAULT 'active',
+            content_hash VARCHAR,
+            metadata JSON,
+            parent_version_id VARCHAR
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_entity_versions_entity
+            ON entity_versions(entity_type, entity_id);
+
+        ALTER TABLE synthetic_datasets ADD COLUMN IF NOT EXISTS version_label VARCHAR DEFAULT '1.0.0';
+        """,
+    ),
 ]
 
 

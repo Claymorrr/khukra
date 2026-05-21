@@ -18,6 +18,7 @@ DOMAIN_ICONS: dict[str, str] = {
 
 DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
     "physical": {
+        "version": "1.0.0",
         "tagline": "Advanced aerodesign operating environment.",
         "positioning": (
             "Aerodynamic geometry, stability, performance envelopes, uncertainty, "
@@ -59,6 +60,7 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
         ],
     },
     "finance": {
+        "version": "1.0.0",
         "tagline": "Quant trading research and operations environment.",
         "positioning": (
             "Alpha research, market microstructure, execution risk, portfolio signals, "
@@ -98,6 +100,7 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
         ],
     },
     "supply_chain": {
+        "version": "1.0.0",
         "tagline": "Resilience, quality, and disruption intelligence.",
         "positioning": "Supply chain forecasting, process drift, disruption risk, and recovery planning.",
         "primary_focus": ["Quality drift", "Disruption intelligence", "Resilience planning"],
@@ -108,6 +111,7 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
         "roadmap": ["Deepen resilience planning", "Add supplier network scenarios"],
     },
     "intelligence": {
+        "version": "1.0.0",
         "tagline": "Computational modeling for signal fusion and indications.",
         "positioning": "Multi-source signal fusion, influence dynamics, and warning systems.",
         "primary_focus": ["Signal fusion", "Influence dynamics", "Adversarial indications"],
@@ -118,6 +122,7 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
         "roadmap": ["Improve signal-fusion metadata", "Add scenario provenance"],
     },
     "computing": {
+        "version": "1.0.0",
         "tagline": "Computational modeling for reliability and accelerated systems.",
         "positioning": "Distributed reliability, accelerator workloads, and cyber-physical edge inference.",
         "primary_focus": ["Distributed reliability", "ML accelerator workloads", "Cyber-physical compute"],

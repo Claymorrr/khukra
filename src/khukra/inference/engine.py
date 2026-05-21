@@ -9,6 +9,7 @@ from khukra.inference.predictors.rule_based import RuleBasedPredictor
 from khukra.inference.registry import get_spec, model_key
 from khukra.inference.types import InferenceModelSpec, PredictionResult
 from khukra.inference.validator import InputValidationError, validate_inputs
+from khukra.versioning.service import get_version_registry
 
 _engine: "InferenceEngine | None" = None
 
@@ -45,6 +46,21 @@ class InferenceEngine:
         result = predictor.predict(validated)
         result.latency_ms = round((time.perf_counter() - start) * 1000, 2)
 
+        registry = get_version_registry()
+        model_entity = model_key(domain, subdomain, model_id)
+        model_version_id = registry.register(
+            "inference_model",
+            model_entity,
+            spec.version,
+            metadata={"predictor_type": spec.predictor_type},
+            content_hash=registry.content_hash(
+                {"model_id": model_id, "version": spec.version, "predictor": spec.predictor_type}
+            ),
+        )
+        result.metadata.setdefault("model_entity_id", model_entity)
+        result.metadata.setdefault("model_version_label", spec.version)
+        result.metadata.setdefault("model_version_id", model_version_id)
+
         inference_id = self.repo.save(result, user_id=user_id)
         result.inference_id = inference_id
 
@@ -53,15 +69,43 @@ class InferenceEngine:
         return result
 
     def _record_lineage(self, result: PredictionResult) -> None:
+        registry = get_version_registry()
         dataset_id = result.metadata.get("synthetic_dataset_id")
         scenario_id = result.metadata.get("scenario_id")
+        model_meta = registry.lineage_version_meta(
+            "inference_model",
+            result.metadata.get("model_entity_id", ""),
+            result.metadata.get("model_version_label", result.model_version),
+            result.metadata.get("model_version_id"),
+        )
         if scenario_id and dataset_id:
+            ds_latest = registry.get_latest("synthetic_dataset", dataset_id)
+            meta = dict(model_meta)
+            if ds_latest:
+                meta.update(
+                    registry.lineage_version_meta(
+                        "synthetic_dataset",
+                        dataset_id,
+                        ds_latest["version_label"],
+                        ds_latest["version_id"],
+                    )
+                )
             self.lineage.record_edge(
-                "scenario", scenario_id, "synthetic_dataset", dataset_id, "generated"
+                "scenario", scenario_id, "synthetic_dataset", dataset_id, "generated", meta
             )
         if dataset_id:
+            ds_latest = registry.get_latest("synthetic_dataset", dataset_id) or {}
+            meta = {
+                **model_meta,
+                **registry.lineage_version_meta(
+                    "synthetic_dataset",
+                    dataset_id,
+                    ds_latest.get("version_label", "1.0.0"),
+                    ds_latest.get("version_id"),
+                ),
+            }
             self.lineage.record_edge(
-                "synthetic_dataset", dataset_id, "inference", result.inference_id, "feeds"
+                "synthetic_dataset", dataset_id, "inference", result.inference_id, "feeds", meta
             )
 
     def predict_batch(

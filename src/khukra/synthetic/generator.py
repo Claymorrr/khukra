@@ -12,6 +12,7 @@ import pandas as pd
 
 from khukra.data.engine import DataEngine, get_engine
 from khukra.synthetic.contracts import validate_dataframe_contract
+from khukra.versioning.service import get_version_registry
 
 
 @dataclass
@@ -77,14 +78,26 @@ class SyntheticDataEngine:
         }
 
         timestamp = datetime.now(timezone.utc)
+        registry = get_version_registry()
+        version_label = registry.next_version_label("synthetic_dataset", dataset_id)
+        content_hash = registry.content_hash(
+            {
+                "scenario_id": scenario.scenario_id,
+                "model_id": scenario.model_id,
+                "seed": scenario.seed,
+                "split": split,
+                "row_count": len(df),
+            }
+        )
         with self.engine.connect() as conn:
             conn.execute(
                 """
                 INSERT INTO synthetic_datasets (
                     dataset_id, created_at, scenario_id, domain, subdomain,
                     model_id, seed, split_name, file_uri, row_count,
-                    column_schema, profile, contract_result, user_id, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ready')
+                    column_schema, profile, contract_result, user_id, status,
+                    version_label
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ready', ?)
                 """,
                 [
                     dataset_id,
@@ -101,8 +114,21 @@ class SyntheticDataEngine:
                     json.dumps(profile),
                     json.dumps(validation),
                     user_id,
+                    version_label,
                 ],
             )
+
+        version_id = registry.register(
+            "synthetic_dataset",
+            dataset_id,
+            version_label,
+            metadata={
+                "scenario_id": scenario.scenario_id,
+                "domain": scenario.domain,
+                "model_id": scenario.model_id,
+            },
+            content_hash=content_hash,
+        )
 
         return {
             "dataset_id": dataset_id,
@@ -111,6 +137,8 @@ class SyntheticDataEngine:
             "row_count": len(df),
             "validation": validation,
             "profile": profile,
+            "version_label": version_label,
+            "version_id": version_id,
         }
 
     def train_val_test_split(

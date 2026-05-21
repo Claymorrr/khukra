@@ -12,6 +12,8 @@ from khukra.api.schemas import (
 )
 from khukra.domains.meta import DOMAIN_MANIFESTS, DOMAIN_META
 from khukra.services.parameter_metadata import enrich_parameter
+from khukra.versioning.policy import CATALOG_SCHEMA_VERSION
+from khukra.versioning.service import get_version_registry
 from khukra.domains.registry import (
     list_domains,
     list_models,
@@ -40,6 +42,7 @@ def _format_label(name: str) -> str:
 def get_catalog() -> CatalogResponse:
     from khukra.domains.registry import get_model
 
+    registry = get_version_registry()
     domains: list[DomainInfo] = []
     for domain_id in list_domains():
         meta = DOMAIN_META[domain_id]
@@ -66,13 +69,19 @@ def get_catalog() -> CatalogResponse:
                     models=models,
                 )
             )
+        manifest_raw = dict(DOMAIN_MANIFESTS.get(domain_id, {}))
+        manifest_raw.setdefault("entity_id", domain_id)
+        manifest_raw.setdefault("version", "1.0.0")
+        latest_manifest = registry.get_latest("domain_manifest", domain_id)
+        if latest_manifest:
+            manifest_raw["version"] = latest_manifest["version_label"]
         domains.append(
             DomainInfo(
                 id=domain_id,
                 label=meta["label"],
                 color=meta["color"],
-                manifest=DomainManifestInfo(**DOMAIN_MANIFESTS.get(domain_id, {})),
+                manifest=DomainManifestInfo(**manifest_raw),
                 subdomains=subdomains,
             )
         )
-    return CatalogResponse(domains=domains)
+    return CatalogResponse(schema_version=CATALOG_SCHEMA_VERSION, domains=domains)

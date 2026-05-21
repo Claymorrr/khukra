@@ -8,6 +8,7 @@ import type {
   RunSummary,
   SweepResponse,
   TokenResponse,
+  VersioningSummary,
 } from "./types";
 
 const API_BASE = "/api";
@@ -43,6 +44,10 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function getCatalog(): Promise<CatalogResponse> {
   return fetchJson("/catalog");
+}
+
+export function getVersioningSummary(): Promise<VersioningSummary> {
+  return fetchJson("/versioning/summary");
 }
 
 export function getStats(): Promise<{
