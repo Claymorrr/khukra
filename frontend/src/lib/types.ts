@@ -24,10 +24,22 @@ export interface SubdomainInfo {
   models: ModelInfo[];
 }
 
+export interface DomainManifestInfo {
+  tagline: string;
+  positioning: string;
+  primary_focus: string[];
+  model_families: string[];
+  data_products: string[];
+  ops_capabilities: string[];
+  module_order: string[];
+  roadmap: string[];
+}
+
 export interface DomainInfo {
   id: string;
   label: string;
   color: string;
+  manifest: DomainManifestInfo;
   subdomains: SubdomainInfo[];
 }
 

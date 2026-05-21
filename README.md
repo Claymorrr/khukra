@@ -27,15 +27,17 @@
 └───────────────────────────────────────────────────────────────┘
 ```
 
-## Domains (5 × 3 research subdomains)
+## Domains
 
 | Domain | Focus |
 |--------|--------|
-| **Physical** | Propulsion — turbomachinery, combustion, hybrid control |
-| **Finance** | Quantitative research — microstructure, stat arb, execution risk |
+| **Physical** | Advanced Aerodesign — geometry, aerodynamics, stability, flight performance |
+| **Finance** | Quant Trading — alpha, microstructure, execution, portfolio risk |
 | **Supply chain** | Quality drift, disruption intelligence, resilience planning |
 | **Intelligence** | Computational modeling systems for signal fusion, influence dynamics, adversarial indications |
 | **Computing** | Computational modeling systems for distributed reliability, ML accelerators, cyber-physical edge |
+
+Each domain has a manifest: identity, focus areas, model families, data products, ops capabilities, module ordering, and roadmap metadata.
 
 ## Setup
 

@@ -29,10 +29,22 @@ class SubdomainInfo(BaseModel):
     models: list[ModelInfo]
 
 
+class DomainManifestInfo(BaseModel):
+    tagline: str = ""
+    positioning: str = ""
+    primary_focus: list[str] = Field(default_factory=list)
+    model_families: list[str] = Field(default_factory=list)
+    data_products: list[str] = Field(default_factory=list)
+    ops_capabilities: list[str] = Field(default_factory=list)
+    module_order: list[str] = Field(default_factory=list)
+    roadmap: list[str] = Field(default_factory=list)
+
+
 class DomainInfo(BaseModel):
     id: str
     label: str
     color: str
+    manifest: DomainManifestInfo = Field(default_factory=DomainManifestInfo)
     subdomains: list[SubdomainInfo]
 
 

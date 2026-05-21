@@ -40,6 +40,7 @@ export function DomainOverview({
   }, []);
 
   const modelCount = domain.subdomains.reduce((n, s) => n + s.models.length, 0);
+  const manifest = domain.manifest;
 
   if (loading) {
     return (
@@ -55,10 +56,13 @@ export function DomainOverview({
         className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.08] to-transparent p-8"
         style={{ borderColor: `${accentColor}33` }}
       >
-        <h3 className="text-2xl font-semibold text-white">{domain.label}</h3>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-          One domain workspace for stochastic modeling, inference, sweeps, data generation, MLOps,
-          analytics, and insights — no separate research/platform split.
+        <p className="text-xs uppercase tracking-[0.28em] text-zinc-600">
+          {manifest.tagline || "Domain operating environment"}
+        </p>
+        <h3 className="mt-3 text-3xl font-semibold tracking-tight text-white">{domain.label}</h3>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500">
+          {manifest.positioning ||
+            "Domain-specific inference, data operations, MLOps, analytics, and insight workflows."}
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <Stat label="Subdomains" value={String(domain.subdomains.length)} />
@@ -66,6 +70,29 @@ export function DomainOverview({
           <Stat label="Inferences" value={String(totalRuns)} />
         </div>
       </section>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <ManifestList title="Focus" items={manifest.primary_focus} accentColor={accentColor} />
+        <ManifestList title="Model Families" items={manifest.model_families} accentColor={accentColor} />
+        <ManifestList title="Data Products" items={manifest.data_products} accentColor={accentColor} />
+      </div>
+
+      {manifest.ops_capabilities.length > 0 && (
+        <section className="rounded-2xl border border-white/10 bg-black/20 p-5">
+          <h4 className="text-sm font-medium text-zinc-300">Ops Layer</h4>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {manifest.ops_capabilities.map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-zinc-400"
+                style={{ borderColor: `${accentColor}44` }}
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
 
       {(summary?.cards ?? []).length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -102,19 +129,58 @@ export function DomainOverview({
       </section>
 
       <section className="rounded-2xl border border-white/10 p-6">
-        <h4 className="text-sm font-medium text-zinc-300">Suggested flow</h4>
+        <h4 className="text-sm font-medium text-zinc-300">Roadmap</h4>
         <ol className="mt-4 space-y-2 text-sm text-zinc-500">
-          {QUICK_MODULES.map((id, i) => {
-            const label = DOMAIN_MODULES.find((m) => m.id === id)?.label ?? id;
-            return (
-              <li key={id}>
-                {i + 1}. Open <button type="button" onClick={() => onNavigate(id)} className="text-zinc-200 hover:underline">{label}</button>
-              </li>
-            );
+          {(manifest.roadmap.length ? manifest.roadmap : QUICK_MODULES).map((item, i) => {
+            if (typeof item === "string" && QUICK_MODULES.includes(item as DomainModule)) {
+              const id = item as DomainModule;
+              const label = DOMAIN_MODULES.find((m) => m.id === id)?.label ?? id;
+              return (
+                <li key={id}>
+                  {i + 1}. Open{" "}
+                  <button
+                    type="button"
+                    onClick={() => onNavigate(id)}
+                    className="text-zinc-200 hover:underline"
+                  >
+                    {label}
+                  </button>
+                </li>
+              );
+            }
+            return <li key={`${item}-${i}`}>{i + 1}. {item}</li>;
           })}
         </ol>
       </section>
     </div>
+  );
+}
+
+function ManifestList({
+  title,
+  items,
+  accentColor,
+}: {
+  title: string;
+  items: string[];
+  accentColor: string;
+}) {
+  if (!items.length) return null;
+  return (
+    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <h4 className="text-sm font-medium text-zinc-300">{title}</h4>
+      <div className="mt-4 space-y-2">
+        {items.map((item) => (
+          <div key={item} className="flex gap-2 text-sm text-zinc-500">
+            <span
+              className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full"
+              style={{ backgroundColor: accentColor }}
+            />
+            <span>{item}</span>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

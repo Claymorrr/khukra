@@ -201,6 +201,12 @@ export function DomainShell({
   }
 
   const accent = ctx.domain.color;
+  const orderedModules = [
+    ...ctx.domain.manifest.module_order
+      .map((id) => DOMAIN_MODULES.find((mod) => mod.id === id))
+      .filter((mod): mod is (typeof DOMAIN_MODULES)[number] => Boolean(mod)),
+    ...DOMAIN_MODULES.filter((mod) => !ctx.domain.manifest.module_order.includes(mod.id)),
+  ];
   const ActivePlatformPanel = PLATFORM_PANELS[moduleFromUrl];
   const showScenarioControls = !["overview", "data_generation", "mlops", "ml_inference", "analytics", "insights"].includes(
     moduleFromUrl
@@ -280,7 +286,7 @@ export function DomainShell({
             )}
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {DOMAIN_MODULES.map((mod) => (
+            {orderedModules.map((mod) => (
               <button
                 key={mod.id}
                 type="button"

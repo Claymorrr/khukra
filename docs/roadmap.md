@@ -39,6 +39,23 @@ Khukra is **domain-first** end-to-end:
 
 ---
 
+## Domain Manifest Architecture (in progress)
+
+Each domain carries manifest metadata that shapes how it appears and how future features are organized:
+
+- **Identity**: label, color, tagline, positioning
+- **Domain strategy**: focus areas, model families, data products
+- **Ops model**: DataOps, MLOps, InfraOps, DevOps, versioning capabilities
+- **Experience**: domain-specific module ordering and overview content
+- **Planning**: roadmap items and issue targets per domain
+
+Priority domains:
+
+- **Physical Systems**: advanced Aerodesign operating environment
+- **Finance**: Quant Trading research and operations environment
+
+---
+
 ## Phase 1 — Deployment (next)
 
 Goal: a stable hosted environment suitable for demo and internal pilot.

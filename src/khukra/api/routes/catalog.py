@@ -2,8 +2,15 @@ from typing import Any
 
 from fastapi import APIRouter
 
-from khukra.api.schemas import CatalogResponse, DomainInfo, ModelInfo, ParameterSchema, SubdomainInfo
-from khukra.domains.meta import DOMAIN_META
+from khukra.api.schemas import (
+    CatalogResponse,
+    DomainInfo,
+    DomainManifestInfo,
+    ModelInfo,
+    ParameterSchema,
+    SubdomainInfo,
+)
+from khukra.domains.meta import DOMAIN_MANIFESTS, DOMAIN_META
 from khukra.services.parameter_metadata import enrich_parameter
 from khukra.domains.registry import (
     list_domains,
@@ -60,6 +67,12 @@ def get_catalog() -> CatalogResponse:
                 )
             )
         domains.append(
-            DomainInfo(id=domain_id, label=meta["label"], color=meta["color"], subdomains=subdomains)
+            DomainInfo(
+                id=domain_id,
+                label=meta["label"],
+                color=meta["color"],
+                manifest=DomainManifestInfo(**DOMAIN_MANIFESTS.get(domain_id, {})),
+                subdomains=subdomains,
+            )
         )
     return CatalogResponse(domains=domains)

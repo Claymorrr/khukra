@@ -43,6 +43,21 @@ def test_physical_aerodesign_registered():
     assert model.subdomain == "aerodesign"
 
 
+def test_catalog_exposes_domain_manifest():
+    from khukra.api.routes.catalog import get_catalog
+
+    resp = get_catalog()
+    physical = next(d for d in resp.domains if d.id == "physical")
+    finance = next(d for d in resp.domains if d.id == "finance")
+
+    assert "Aerodesign" in physical.label
+    assert "aerodesign" in physical.manifest.tagline.lower()
+    assert "MLOps" in physical.manifest.ops_capabilities
+    assert "data_generation" in physical.manifest.module_order
+    assert "Quant Trading" in finance.label
+    assert "Alpha" in " ".join(finance.manifest.primary_focus)
+
+
 def test_catalog_enriched_parameters():
     from khukra.api.routes.catalog import get_catalog
 
