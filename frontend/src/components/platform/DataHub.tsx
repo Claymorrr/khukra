@@ -74,13 +74,13 @@ export function DataHub({ domainId, accentColor }: DataHubProps) {
       <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-transparent p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-zinc-600">Data Product OS</p>
+            <p className="text-xs uppercase tracking-[0.28em] text-zinc-600">Domain data plane</p>
             <h3 className="mt-2 flex items-center gap-2 text-2xl font-semibold text-white">
               <Layers className="h-6 w-6" style={{ color: accentColor }} />
               Data Hub
             </h3>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-              Governed catalog of ingested files and synthetic datasets — schema, contracts, versions,
+              Governed catalog of ingested files, synthetic datasets, and solver outputs - schema, contracts, versions,
               lineage, and preview in one place. Domains filter products; products are the system of record.
             </p>
           </div>

@@ -14,7 +14,6 @@ import {
   LineChart,
   Loader2,
   LogOut,
-  Sparkles,
   Truck,
   Workflow,
 } from "lucide-react";
@@ -30,6 +29,7 @@ import { PlatformMLOpsPanel } from "./PlatformMLOpsPanel";
 import { MLInferencingPanel } from "./MLInferencingPanel";
 import { AnalyticsWorkbench } from "./AnalyticsWorkbench";
 import { InsightsEngineering } from "./InsightsEngineering";
+import { KhukraLogo } from "@/components/brand/KhukraLogo";
 
 export type PlatformModule =
   | "overview"
@@ -157,10 +157,7 @@ export function PlatformShell({
     <div className="flex h-screen overflow-hidden bg-[#07090d]">
       <aside className="flex w-64 shrink-0 flex-col border-r border-white/10 bg-black/40">
         <div className="border-b border-white/10 px-5 py-6">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-zinc-500">
-            <Sparkles className="h-4 w-4 text-sky-400" />
-            Khukra Platform
-          </p>
+          <KhukraLogo accentColor={accent} subtitle="Platform" />
           <h1 className="mt-2 text-lg font-semibold text-white">By domain</h1>
           <p className="mt-1 text-xs leading-5 text-zinc-600">
             Data, MLOps, inference, analytics, and insights per domain.

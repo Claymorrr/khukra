@@ -5,7 +5,7 @@ from typing import Any
 from khukra.data.repositories.inferences import InferenceRepository
 from khukra.data.repositories.lineage import LineageRepository
 from khukra.domains.registry import get_model
-from khukra.inference.predictors.rule_based import RuleBasedPredictor
+from khukra.inference.predictors.registry import get_predictor
 from khukra.inference.registry import get_spec, model_key
 from khukra.inference.types import InferenceModelSpec, PredictionResult
 from khukra.inference.validator import InputValidationError, validate_inputs
@@ -15,7 +15,7 @@ _engine: "InferenceEngine | None" = None
 
 
 class InferenceEngine:
-    """Execute validated inference requests and persist prediction events."""
+    """Inference runtime for domain workloads (simulations, solvers, backtests, forecasts)."""
 
     def __init__(self, repo: InferenceRepository | None = None):
         self.repo = repo or InferenceRepository()
@@ -42,7 +42,7 @@ class InferenceEngine:
 
         start = time.perf_counter()
         model = get_model(domain, subdomain, model_id)
-        predictor = RuleBasedPredictor(spec, model)
+        predictor = get_predictor(spec, model)
         result = predictor.predict(validated)
         result.latency_ms = round((time.perf_counter() - start) * 1000, 2)
 

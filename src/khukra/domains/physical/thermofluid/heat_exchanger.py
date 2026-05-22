@@ -4,6 +4,10 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 from khukra.core.model import Model, ModelResult
+from khukra.domains.physical.analytics import relative_steady_state_error
+from khukra.domains.physical.core import SolverResultSummary
+from khukra.domains.physical.models_registry import SOLVER_SPECS
+from khukra.domains.physical.solver_base import enrich_solver_result, prepare_solver_parameters
 
 
 class CounterflowHeatExchanger(Model):
@@ -25,7 +29,7 @@ class CounterflowHeatExchanger(Model):
         }
 
     def run(self, parameters: dict[str, Any] | None = None) -> ModelResult:
-        p = {**self.default_parameters(), **(parameters or {})}
+        p = prepare_solver_parameters(self, parameters)
         ua = p["ua_w_per_k"]
         ch, cc = p["hot_capacity"], p["cold_capacity"]
         c_min = min(ch, cc)
@@ -50,7 +54,7 @@ class CounterflowHeatExchanger(Model):
         th, tc = sol.y[0], sol.y[1]
         q_transfer = ua * (th - tc)
 
-        return ModelResult(
+        result = ModelResult(
             domain=self.domain,
             subdomain=self.subdomain,
             model_name=self.name,
@@ -61,6 +65,7 @@ class CounterflowHeatExchanger(Model):
                 "steady_hot_outlet_c": float(th[-1]),
                 "steady_cold_outlet_c": float(tc[-1]),
                 "peak_heat_transfer_kw": float(np.max(q_transfer) / 1000),
+                "hot_outlet_steady_error": relative_steady_state_error(th),
             },
             series={
                 "time_s": sol.t.tolist(),
@@ -69,3 +74,10 @@ class CounterflowHeatExchanger(Model):
                 "heat_transfer_kw": (q_transfer / 1000).tolist(),
             },
         )
+        spec = SOLVER_SPECS[self.name]
+        numerical = SolverResultSummary(
+            integration_success=bool(sol.success),
+            n_steps=int(sol.t.size),
+            notes=str(sol.message) if sol.message else "",
+        )
+        return enrich_solver_result(result, spec, numerical=numerical)

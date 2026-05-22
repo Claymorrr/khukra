@@ -42,6 +42,10 @@ function DomainRedirect() {
     if (model) extra.set("model", model);
     if (module && !MODULE_TO_ZONE[module]) extra.set("legacyModule", module);
     const q = extra.toString() ? `?${extra}` : "";
+    if (domainId === "physical" && zone === "workflows" && sub && model) {
+      router.replace(`/d/${domainId}/workflows/${sub}/${model}${q}`);
+      return;
+    }
     router.replace(`/d/${domainId}/${zone}${q}`);
   }, [domainId, module, router, searchParams, zone]);
 

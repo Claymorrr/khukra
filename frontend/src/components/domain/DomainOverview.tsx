@@ -98,7 +98,7 @@ export function DomainOverview({
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <Stat label="Subdomains" value={String(domain.subdomains.length)} />
           <Stat label="Models" value={String(modelCount)} />
-          <Stat label="Inferences" value={String(totalRuns)} />
+          <Stat label={domain.id === "physical" ? "Solver runs" : "Inferences"} value={String(totalRuns)} />
         </div>
       </section>
 

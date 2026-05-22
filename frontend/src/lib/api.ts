@@ -1,4 +1,5 @@
 import { getStoredToken } from "./auth";
+import { resolveApiRoot } from "./apiBase";
 import { normalizeDomain } from "./domainManifest";
 import type {
   CatalogResponse,
@@ -15,11 +16,37 @@ import type {
   VersioningSummary,
 } from "./types";
 
-const API_BASE = "/api";
+function apiBase(): string {
+  return resolveApiRoot();
+}
+
+async function parseJsonBody<T>(res: Response): Promise<T> {
+  const text = await res.text();
+  const trimmed = text.trim();
+  if (!trimmed) {
+    throw new Error("Empty response from API. Is the Khukra backend running?");
+  }
+  try {
+    return JSON.parse(trimmed) as T;
+  } catch {
+    const preview = trimmed.slice(0, 100).replace(/\s+/g, " ");
+    if (res.status === 502) {
+      throw new Error(
+        trimmed.startsWith("{")
+          ? (JSON.parse(trimmed) as { detail?: string }).detail ||
+            "Cannot reach Khukra API. Run .\\scripts\\start-dev.ps1."
+          : "Cannot reach Khukra API. Run .\\scripts\\start-dev.ps1."
+      );
+    }
+    throw new Error(
+      `API returned non-JSON (HTTP ${res.status}). Run .\\scripts\\start-dev.ps1 or check KHUKRA_API_URL. Preview: ${preview}`
+    );
+  }
+}
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getStoredToken();
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetch(`${apiBase()}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -43,7 +70,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     }
     throw new Error(text || `Request failed: ${res.status}`);
   }
-  return res.json() as Promise<T>;
+  return parseJsonBody<T>(res);
 }
 
 export function getCatalog(): Promise<CatalogResponse> {
@@ -261,17 +288,17 @@ export async function ingestDataset(
   if (name) form.append("name", name);
   if (domainTag) form.append("domain_tag", domainTag);
 
-  const res = await fetch(`${API_BASE}/datasets/ingest`, {
+  const res = await fetch(`${apiBase()}/datasets/ingest`, {
     method: "POST",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: form,
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return parseJsonBody(res);
 }
 
 export function exportUrl(path: string): string {
-  return `${API_BASE}${path}`;
+  return `${apiBase()}${path}`;
 }
 
 export interface InsightCard {

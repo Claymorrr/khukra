@@ -7,7 +7,9 @@ from functools import lru_cache
 from khukra.application.governance.contracts import ContractUseCases
 from khukra.application.knowledge.assets import KnowledgeUseCases
 from khukra.application.lineage.graph import LineageGraphService
+from khukra.application.lake.domain_lake import DomainLakeUseCases
 from khukra.application.products.catalog import ProductCatalogUseCases
+from khukra.application.workloads.runtime import WorkloadUseCases
 from khukra.application.workflows.registry import WorkflowUseCases
 from khukra.services.query_service import QueryService
 
@@ -15,6 +17,8 @@ from khukra.services.query_service import QueryService
 class AppContainer:
     def __init__(self) -> None:
         self.products = ProductCatalogUseCases()
+        self.workloads = WorkloadUseCases()
+        self.lake = DomainLakeUseCases()
         self.workflows = WorkflowUseCases()
         self.contracts = ContractUseCases()
         self.lineage = LineageGraphService()

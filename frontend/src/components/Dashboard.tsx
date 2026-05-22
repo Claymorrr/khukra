@@ -83,12 +83,13 @@ export function Dashboard({ onSwitchToPlatform }: DashboardProps) {
     setError(null);
     try {
       const physical = catalog.domains.find((d) => d.id === "physical");
-      const model = physical?.subdomains.find((s) => s.id === "turbomachinery_degradation")?.models[0];
+      const subdomain = physical?.subdomains.find((s) => s.id === "mechanics");
+      const model = subdomain?.models.find((m) => m.id === "cantilever_beam") ?? subdomain?.models[0];
       if (!physical || !model) throw new Error("Demo model not found");
 
       const res = await createInference({
         domain: "physical",
-        subdomain: "turbomachinery_degradation",
+        subdomain: subdomain?.id ?? "mechanics",
         model: model.id,
         inputs: {},
       });
@@ -96,7 +97,7 @@ export function Dashboard({ onSwitchToPlatform }: DashboardProps) {
       setLastDemo(res);
       setSelection({
         domainId: "physical",
-        subdomainId: "turbomachinery_degradation",
+        subdomainId: subdomain?.id ?? "mechanics",
         modelId: model.id,
       });
       setTab("results");
@@ -194,8 +195,8 @@ export function Dashboard({ onSwitchToPlatform }: DashboardProps) {
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <HeaderPill label={`${modelInputs} inputs`} />
-                <HeaderPill label={`${totalModels} research models`} />
-                <HeaderPill label={result ? `last run ${result.run_id}` : "ready for inference"} />
+                <HeaderPill label={`${totalModels} models`} />
+                <HeaderPill label={result ? `last run ${result.run_id}` : "ready to run"} />
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -230,7 +231,7 @@ export function Dashboard({ onSwitchToPlatform }: DashboardProps) {
                 style={{ backgroundColor: accent }}
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 fill-current" />}
-                Infer
+                {ctx.domain.id === "physical" ? "Solve" : "Infer"}
               </button>
             </div>
           </div>
@@ -246,7 +247,9 @@ export function Dashboard({ onSwitchToPlatform }: DashboardProps) {
                     Scenario controls
                   </h3>
                   <p className="mt-1 text-xs text-zinc-600">
-                    Adjust stochastic generator parameters before inference, sweeps, or MLOps pipeline runs.
+                    {ctx.domain.id === "physical"
+                      ? "Adjust physical parameters before solver runs, sweeps, or surrogate workflows."
+                      : "Adjust stochastic generator parameters before inference, sweeps, or MLOps pipeline runs."}
                   </p>
                 </div>
                 <button
@@ -360,10 +363,13 @@ export function Dashboard({ onSwitchToPlatform }: DashboardProps) {
                 </>
               ) : (
                 <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.02] px-6 py-16 text-center">
-                  <p className="text-lg font-medium text-zinc-300">No inference selected</p>
+                  <p className="text-lg font-medium text-zinc-300">
+                    {ctx.domain.id === "physical" ? "No solver run selected" : "No inference selected"}
+                  </p>
                   <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-zinc-600">
-                    Press Infer to generate a stochastic synthetic scenario, forecasts, uncertainty intervals,
-                    and lineage-ready metadata for this model.
+                    {ctx.domain.id === "physical"
+                      ? "Press Solve to run the selected physics model and inspect solver metrics, traces, numerical status, and metadata."
+                      : "Press Infer to generate a stochastic synthetic scenario, forecasts, uncertainty intervals, and lineage-ready metadata for this model."}
                   </p>
                 </div>
               )}

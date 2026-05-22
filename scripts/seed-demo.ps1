@@ -4,8 +4,11 @@ Set-Location $root
 
 $demos = @(
     @{ domain = "physical"; subdomain = "structural_mechanics"; model = "damped_oscillator" },
-    @{ domain = "finance"; subdomain = "derivatives_risk"; model = "black_scholes_option" },
-    @{ domain = "supply_chain"; subdomain = "inventory_management"; model = "inventory_simulation" }
+    @{ domain = "finance"; subdomain = "market_research"; model = "market_scenario_research" },
+    @{ domain = "finance"; subdomain = "strategy_backtesting"; model = "strategy_backtest_validation" },
+    @{ domain = "finance"; subdomain = "strategy_delivery"; model = "paper_trading_delivery_gate" },
+    @{ domain = "supply_chain"; subdomain = "disruption_intelligence"; model = "disruption_risk_forecast" }
+    @{ domain = "supply_chain"; subdomain = "quality_drift"; model = "defect_rate_forecast" }
 )
 
 foreach ($d in $demos) {

@@ -1,8 +1,11 @@
 """Shared domain labels and UI metadata for catalog and platform manifest."""
 
 DOMAIN_META: dict[str, dict[str, str]] = {
-    "physical": {"label": "Physical Systems — Advanced Aerodesign", "color": "#38bdf8"},
-    "finance": {"label": "Finance — Quant Trading", "color": "#34d399"},
+    "physical": {
+        "label": "Physical Systems — Physics Solvers & Analytics",
+        "color": "#38bdf8",
+    },
+    "finance": {"label": "Finance — Automated Trading R&D", "color": "#34d399"},
     "supply_chain": {"label": "Supply Chain — Quality & Disruptions", "color": "#fbbf24"},
     "intelligence": {"label": "Intelligence — Computational Modeling Systems", "color": "#a78bfa"},
     "computing": {"label": "Computing — Computational Modeling Systems", "color": "#f472b6"},
@@ -18,47 +21,63 @@ DOMAIN_ICONS: dict[str, str] = {
 
 DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
     "physical": {
-        "version": "1.0.0",
-        "tagline": "Advanced aerodesign operating environment.",
+        "version": "2.0.0",
+        "tagline": "Physics solvers, scientific analytics, sweeps, and surrogate-ready datasets.",
         "positioning": (
-            "Aerodynamic geometry, stability, performance envelopes, uncertainty, "
-            "and optimization-ready aerospace evidence."
+            "First-principles mechanics, thermofluid, and dynamics solvers with validation metrics, "
+            "parameter sweeps, simulation traces, and paths to surrogate predictors — "
+            "general physical systems, not application-specific domains."
         ),
         "primary_focus": [
-            "Parametric airframe and wing geometry",
-            "Aerodynamic performance and drag build-up",
-            "Stability, control, and flight-envelope margins",
-            "Aero-structural and mission trade studies",
+            "Mechanics — static structures and vibration",
+            "Thermofluid — heat transfer and thermal transients",
+            "Dynamics — ODE motion and state-space simulation",
+            "Parameter sweeps and scientific validation metrics",
+            "Surrogate predictors trained from solver outputs",
         ],
         "model_families": [
-            "Lift/drag polar inference",
-            "Static margin and control derivative forecasting",
-            "Mission range and endurance performance",
-            "Surrogate CFD response surfaces",
+            "Analytic and numerical mechanics solvers",
+            "Thermofluid heat-transfer models",
+            "Dynamic simulation and state-space integrators",
+            "Sweep datasets and solver artifact lineage",
+            "Surrogate predictor candidates",
         ],
         "data_products": [
-            "Design-space synthetic datasets",
-            "Configuration lineage and comparison tables",
-            "Aero performance traces and uncertainty bands",
+            "Parameter sweep datasets",
+            "Simulation traces and solver artifacts",
+            "Surrogate training and evaluation tables",
+            "Experimental and validation evidence",
         ],
         "data_product_bindings": [
             {
-                "family_id": "physical.design_space",
-                "label": "Design-space synthetic datasets",
+                "family_id": "physical.parameter_sweeps",
+                "label": "Parameter sweep datasets",
                 "kind": "synthetic",
-                "description": "Parametric geometry and aerodynamic scenario tables.",
+                "description": "Grids of solver inputs and resulting metrics for design studies.",
             },
             {
-                "family_id": "physical.lineage_tables",
-                "label": "Configuration lineage and comparison tables",
+                "family_id": "physical.simulation_traces",
+                "label": "Simulation traces and solver outputs",
+                "kind": "synthetic",
+                "description": "ODE time series and spatial profiles from registered solvers.",
+            },
+            {
+                "family_id": "physical.solver_artifacts",
+                "label": "Solver run artifacts",
                 "kind": "ingested",
-                "description": "Uploaded comparison and configuration evidence.",
+                "description": "Persisted mechanics, thermofluid, and dynamics run outputs.",
             },
             {
-                "family_id": "physical.performance_traces",
-                "label": "Aero performance traces and uncertainty bands",
+                "family_id": "physical.surrogate_eval",
+                "label": "Surrogate evaluation tables",
                 "kind": "synthetic",
-                "description": "Time-series performance and uncertainty outputs.",
+                "description": "Holdout metrics and surrogate comparison against solver ground truth.",
+            },
+            {
+                "family_id": "physical.validation_evidence",
+                "label": "Validation and experimental evidence",
+                "kind": "ingested",
+                "description": "Uploaded test data, benchmarks, and validation reports.",
             },
         ],
         "recommended_workflows": [
@@ -67,6 +86,7 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
             "analytics",
             "mlops",
             "compare",
+            "sweeps",
         ],
         "ops_capabilities": ["DataOps", "MLOps", "InfraOps", "DevOps", "Versioning"],
         "module_order": [
@@ -85,92 +105,155 @@ DOMAIN_MANIFESTS: dict[str, dict[str, object]] = {
             "insights",
         ],
         "roadmap": [
-            "Promote Aerodesign to the primary Physical Systems experience",
-            "Add advanced aero performance and stability models",
-            "Introduce design-space versioning and DataOps readiness",
+            "Expand mechanics, thermofluid, and dynamics solver catalog",
+            "Lake-backed parameter sweeps and validation metrics",
+            "Surrogate training from solver traces with error reporting",
+            "Packaged solver products with versioned scientific artifacts",
         ],
     },
     "finance": {
-        "version": "1.0.0",
-        "tagline": "Quant trading research and operations environment.",
+        "version": "2.0.0",
+        "tagline": "Automated trading product — continuous research, development, integration, and paper delivery.",
         "positioning": (
-            "Alpha research, market microstructure, execution risk, portfolio signals, "
-            "and trading-system evaluation."
+            "End-to-end quant trading lifecycle: market research, signal development, "
+            "backtest validation, execution simulation, portfolio risk, and paper-trading "
+            "release gates. Broker-ready architecture; live routing out of scope."
         ),
         "primary_focus": [
-            "Alpha signal generation and decay",
-            "Market microstructure and liquidity",
-            "Execution slippage and market impact",
-            "Portfolio risk and regime-aware evaluation",
+            "Market research and liquidity regimes",
+            "Signal research and alpha decay",
+            "Strategy backtesting and Sharpe gates",
+            "Execution simulation and paper-order fills",
+            "Portfolio risk and allocation optimization",
+            "Strategy delivery and paper-deployment readiness",
         ],
         "model_families": [
-            "Signal forecast and decay inference",
-            "Order book liquidity forecasting",
-            "Spread mean-reversion and regime detection",
-            "Execution and drawdown risk inference",
+            "Market scenario and liquidity regime research",
+            "Statistical arbitrage and alpha decay signals",
+            "Backtest validation with Sharpe and drawdown gates",
+            "Execution slippage and paper-fill simulation",
+            "Portfolio risk envelopes and mean-variance allocation",
+            "Release readiness and paper-trading delivery gates",
         ],
         "data_products": [
             "Market scenario datasets",
-            "Signal evaluation and backtest artifacts",
-            "Execution cost and risk traces",
+            "Signal and backtest validation artifacts",
+            "Execution simulation traces",
+            "Portfolio risk and allocation outputs",
+            "Strategy release candidates",
         ],
         "data_product_bindings": [
             {
                 "family_id": "finance.market_scenarios",
                 "label": "Market scenario datasets",
                 "kind": "synthetic",
-                "description": "Synthetic market and microstructure scenarios.",
+                "description": "Synthetic market, microstructure, and liquidity regime scenarios.",
             },
             {
                 "family_id": "finance.signal_eval",
-                "label": "Signal evaluation and backtest artifacts",
+                "label": "Signal and backtest validation artifacts",
                 "kind": "ingested",
-                "description": "Backtest tables and signal evaluation exports.",
+                "description": "Signal research outputs, backtest tables, and validation exports.",
             },
             {
                 "family_id": "finance.execution_risk",
-                "label": "Execution cost and risk traces",
+                "label": "Execution simulation traces",
                 "kind": "synthetic",
-                "description": "Execution slippage and risk time series.",
+                "description": "Slippage, fill rate, and paper-order simulation time series.",
+            },
+            {
+                "family_id": "finance.portfolio_risk",
+                "label": "Portfolio risk and allocation outputs",
+                "kind": "synthetic",
+                "description": "Drawdown envelopes, VaR proxies, and optimizer weights.",
+            },
+            {
+                "family_id": "finance.strategy_releases",
+                "label": "Strategy release candidates",
+                "kind": "ingested",
+                "description": "Paper-trading release readiness and deployment gate records.",
             },
         ],
-        "recommended_workflows": ["data_hub", "analytics", "data_generation", "mlops"],
+        "recommended_workflows": [
+            "data_hub",
+            "data_generation",
+            "analytics",
+            "mlops",
+            "compare",
+        ],
         "ops_capabilities": ["DataOps", "MLOps", "InfraOps", "DevOps", "Versioning"],
         "module_order": [
             "overview",
             "data_hub",
             "knowledge",
             "inference",
+            "data_generation",
             "analytics",
             "compare",
-            "data_generation",
+            "data",
             "mlops",
             "infraops",
             "devops",
             "insights",
         ],
         "roadmap": [
-            "Refocus Finance around quant trading workflows",
-            "Add alpha, execution, and risk model suites",
-            "Version data, signals, models, and backtest artifacts",
+            "Continuous research loop for market and signal models",
+            "Backtest gates before execution simulation",
+            "Paper-trading delivery with CI/release readiness checks",
+            "Version signals, backtests, and strategy bundles with lineage",
+            "Broker adapter integration (paper-only until Phase 2+)",
         ],
     },
     "supply_chain": {
-        "version": "1.0.0",
-        "tagline": "Resilience, quality, and disruption intelligence.",
-        "positioning": "Supply chain forecasting, process drift, disruption risk, and recovery planning.",
-        "primary_focus": ["Quality drift", "Disruption intelligence", "Resilience planning"],
-        "model_families": ["Defect-rate forecasts", "Disruption risk forecasts", "Recovery-time forecasts"],
-        "data_products": ["Supplier risk datasets", "Quality traces", "Recovery simulations"],
-        "data_product_bindings": [
-            {"family_id": "supply_chain.supplier_risk", "label": "Supplier risk datasets", "kind": "synthetic", "description": ""},
-            {"family_id": "supply_chain.quality", "label": "Quality traces", "kind": "ingested", "description": ""},
-            {"family_id": "supply_chain.recovery", "label": "Recovery simulations", "kind": "synthetic", "description": ""},
+        "version": "2.0.0",
+        "tagline": "Global disruption forecast and product quality intelligence.",
+        "positioning": (
+            "Simulate defect drift, correlated global disruptions, supplier contagion, "
+            "and recovery under buffer and alternate-supplier policies."
+        ),
+        "primary_focus": [
+            "Product quality — defect rates, Cpk, escape risk, warranty exposure",
+            "Global disruption — regional shocks, port delays, supplier contagion",
+            "Resilience planning — recovery time, buffers, service level at risk",
         ],
-        "recommended_workflows": ["data_hub", "data_generation", "analytics"],
+        "model_families": [
+            "Quality drift simulation",
+            "Disruption intelligence simulation",
+            "Recovery and resilience simulation",
+        ],
+        "data_products": [
+            "Supplier risk scenarios",
+            "Quality trace datasets",
+            "Recovery simulation artifacts",
+        ],
+        "data_product_bindings": [
+            {
+                "family_id": "supply_chain.supplier_risk",
+                "label": "Supplier risk scenarios",
+                "kind": "synthetic",
+                "description": "Regional disruption signals, contagion, and port-delay indices.",
+            },
+            {
+                "family_id": "supply_chain.quality",
+                "label": "Quality traces",
+                "kind": "ingested",
+                "description": "Lot-level defect, Cpk, escape risk, and warranty exposure time series.",
+            },
+            {
+                "family_id": "supply_chain.recovery",
+                "label": "Recovery simulations",
+                "kind": "synthetic",
+                "description": "Recovery days, buffer drawdown, and service-level trajectories under shocks.",
+            },
+        ],
+        "recommended_workflows": ["data_hub", "data_generation", "analytics", "mlops"],
         "ops_capabilities": ["DataOps", "MLOps", "Versioning"],
         "module_order": ["overview", "data_hub", "inference", "data_generation", "mlops", "analytics", "insights"],
-        "roadmap": ["Deepen resilience planning", "Add supplier network scenarios"],
+        "roadmap": [
+            "Lake-backed supplier network scenarios",
+            "Quality containment linked to disruption severity",
+            "Multi-region disruption stress packs",
+        ],
     },
     "intelligence": {
         "version": "1.0.0",

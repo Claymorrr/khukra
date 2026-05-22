@@ -1,4 +1,8 @@
-"""MLOps orchestration: synthetic → validate → register → evaluate → infer."""
+"""Inference lifecycle pipeline: develop → validate → package → operate.
+
+Maps legacy MLOps orchestration to the cockpit delivery model:
+develop (run workload) → validate (gates) → package (artifact) → operate (evaluate/promote).
+"""
 
 from typing import Any
 

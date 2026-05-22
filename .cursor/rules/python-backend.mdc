@@ -1,0 +1,14 @@
+---
+description: Python backend conventions for Khukra
+globs: **/*.py
+alwaysApply: false
+---
+
+# Python Backend
+
+- Keep FastAPI routes thin; put workflows in `src/khukra/application/` or `src/khukra/services/`.
+- Keep DuckDB access in repositories under `src/khukra/data/repositories/`.
+- Register domain behavior through existing registries instead of ad hoc imports.
+- Add pytest coverage for changed domain, API, repository, or service behavior.
+- Run `ruff check src tests` and `pytest tests -q` for backend changes.
+- Preserve public response shapes unless the PR documents a breaking change.

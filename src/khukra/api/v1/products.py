@@ -27,8 +27,11 @@ def list_products(
 
 @router.post("/sync")
 def sync_products() -> dict[str, int]:
-    count = get_app_container().products.sync_legacy()
-    return {"synced": count}
+    """Legacy alias — prefer POST /api/v1/domains/{domain}/lake/sync."""
+    container = get_app_container()
+    count = container.products.sync_legacy()
+    container.lake.sync_domain_lake()
+    return {"synced": count, "deprecated": True, "use": "/api/v1/domains/{domain}/lake/sync"}
 
 
 @router.get("/{product_id}", response_model=DataProductDetail)

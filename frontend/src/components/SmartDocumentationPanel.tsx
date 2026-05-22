@@ -22,43 +22,56 @@ interface SmartDocumentationPanelProps {
 
 const DOMAIN_GUIDES: Record<string, {
   intent: string;
-  stochasticCore: string[];
+  methodCore: string[];
   researchQuestions: string[];
   optimizationLens: string;
 }> = {
   physical: {
-    intent: "Propulsion-system computational modeling for degradation, combustion instability, and hybrid mission control.",
-    stochasticCore: ["jump diffusion", "compound shocks", "regime switching", "stochastic volatility"],
+    intent: "Physics solver workspace for mechanics, thermofluid, and dynamics models with equations, state variables, traces, and validation metrics.",
+    methodCore: ["governing equations", "state variables", "numerical status", "parameter sweeps", "solver traces"],
     researchQuestions: [
-      "Which operating regimes create maintenance risk?",
-      "How early can instability be forecast before threshold breach?",
-      "What control policy preserves thrust while protecting thermal margin?",
+      "Which parameters dominate the output response?",
+      "Does the numerical solution satisfy expected steady-state or conservation behavior?",
+      "Which solver traces are good candidates for surrogate training?",
     ],
-    optimizationLens: "Optimize operating envelopes, power split, inspection timing, and robustness under rare shocks.",
+    optimizationLens: "Optimize physical parameters, stability margins, steady-state behavior, and solver-to-surrogate error.",
   },
   finance: {
-    intent: "Quantitative research environment for stochastic signals, market microstructure, stat-arb spreads, and execution risk.",
-    stochasticCore: ["Hawkes arrivals", "stochastic volatility", "mean reversion", "jump shocks"],
-    researchQuestions: [
-      "How persistent is liquidity under self-exciting order flow?",
-      "Which spread regimes are exploitable after costs?",
-      "What execution schedule minimizes tail slippage?",
+    intent: "Automated trading R&D product: market research, signal development, backtest gates, execution simulation, portfolio risk, and paper-delivery readiness.",
+    methodCore: [
+      "market scenarios",
+      "signal decay",
+      "backtest Sharpe gates",
+      "execution slippage sim",
+      "paper delivery gates",
     ],
-    optimizationLens: "Optimize signal weighting, risk budgets, execution participation, and stress-aware allocation.",
+    researchQuestions: [
+      "Which market regimes support deployable liquidity?",
+      "Do signals pass backtest Sharpe and drawdown gates?",
+      "Does paper execution simulation meet slippage and fill targets?",
+      "Is the strategy release candidate ready for paper trading?",
+    ],
+    optimizationLens: "Optimize research throughput, validation gates, execution quality, risk limits, and paper-release readiness.",
   },
   supply_chain: {
-    intent: "Product-quality and global-disruption modeling for defect drift, shock propagation, and recovery planning.",
-    stochasticCore: ["compound Poisson disruptions", "Hawkes event cascades", "quality drift", "shock processes"],
-    researchQuestions: [
-      "Which process drift predicts defect acceleration?",
-      "How do correlated disruptions propagate through suppliers?",
-      "What buffers reduce recovery time under severe scenarios?",
+    intent: "Product-quality and global-disruption simulation for defect drift, regional shock cascades, supplier contagion, and recovery planning.",
+    methodCore: [
+      "quality drift and Cpk",
+      "regional correlated shocks",
+      "Hawkes disruption cascades",
+      "supplier contagion",
+      "buffer and recovery trajectories",
     ],
-    optimizationLens: "Optimize buffers, supplier substitution, inspection cadence, and disruption response policies.",
+    researchQuestions: [
+      "Which process drift and inspection gaps drive defect escape and warranty exposure?",
+      "How do geopolitical, weather, and logistics shocks combine into global risk?",
+      "What buffer and alternate-supplier policies minimize recovery time and service-level risk?",
+    ],
+    optimizationLens: "Optimize inspection cadence, supplier substitution, buffer days, expedite capacity, and disruption response playbooks.",
   },
   intelligence: {
     intent: "Intelligence computational modeling systems for stochastic signal fusion, influence diffusion, and adversarial warning.",
-    stochasticCore: ["Bayesian belief state", "Hawkes cascades", "regime switching", "jump anomalies"],
+    methodCore: ["Bayesian belief state", "Hawkes cascades", "regime switching", "jump anomalies"],
     researchQuestions: [
       "Which source mix raises confidence before false alarms rise?",
       "How does narrative diffusion accelerate after trigger events?",
@@ -68,7 +81,7 @@ const DOMAIN_GUIDES: Record<string, {
   },
   computing: {
     intent: "Computing computational modeling systems for reliability, accelerator workloads, and edge cyber-physical behavior.",
-    stochasticCore: ["queueing load", "stochastic volatility", "compound incidents", "latent belief states"],
+    methodCore: ["queueing load", "stochastic volatility", "compound incidents", "latent belief states"],
     researchQuestions: [
       "When does latency saturation become an incident?",
       "How do accelerator workloads degrade under memory pressure?",
@@ -78,13 +91,40 @@ const DOMAIN_GUIDES: Record<string, {
   },
 };
 
-const PIPELINE_STEPS = [
+const DEFAULT_PIPELINE_STEPS = [
   ["Synthetic scenario", "Mathematical stochastic process generates reproducible observations."],
   ["Data contract", "Schema and quality checks profile the synthetic dataset."],
   ["Forecast inference", "The model estimates point forecasts and uncertainty intervals."],
   ["Registry event", "Predictions can be promoted into artifact/evaluation records."],
   ["Lineage graph", "Scenario, dataset, inference, artifact, and evaluation IDs stay linked."],
 ];
+
+const PHYSICAL_PIPELINE_STEPS = [
+  ["Solver parameters", "Inputs define physical quantities, units, and boundary or initial conditions."],
+  ["Equation run", "The registered solver evaluates analytic or numerical governing equations."],
+  ["Scientific metrics", "Outputs summarize extrema, steady state, energy, stability, and numerical status."],
+  ["Simulation traces", "Time or spatial series become sweep evidence and surrogate training data."],
+  ["Lineage graph", "Solver run, metrics, traces, and artifacts stay linked for reproducible science."],
+];
+
+type SolverSpecMetadata = {
+  title?: string;
+  model_kind?: string;
+  governing_equations?: string;
+  assumptions?: string[];
+  parameters?: Array<{ name: string; unit?: string; description?: string }>;
+  state_variables?: Array<{ name: string; unit?: string; role?: string; description?: string }>;
+  outputs?: Array<{ name: string; unit?: string; label?: string; description?: string }>;
+  equations?: Array<{
+    name: string;
+    form: string;
+    variables?: string[];
+    parameters?: string[];
+    equation_type?: string;
+    residual?: string | null;
+    description?: string;
+  }>;
+};
 
 export function SmartDocumentationPanel({
   catalog,
@@ -97,6 +137,11 @@ export function SmartDocumentationPanel({
   const model = subdomain?.models.find((m) => m.id === selection.modelId);
   const guide = DOMAIN_GUIDES[selection.domainId] ?? DOMAIN_GUIDES.physical;
   const metadata = result?.metadata ?? {};
+  const solverSpec =
+    (metadata.solver_spec as SolverSpecMetadata | undefined) ??
+    (model?.solver_spec as SolverSpecMetadata | undefined);
+  const isPhysical = selection.domainId === "physical";
+  const pipelineSteps = isPhysical ? PHYSICAL_PIPELINE_STEPS : DEFAULT_PIPELINE_STEPS;
 
   return (
     <div className="space-y-6">
@@ -125,24 +170,62 @@ export function SmartDocumentationPanel({
             <InfoTile label="Model" value={model?.label ?? selection.modelId} />
             <InfoTile label="Parameters" value={`${model?.parameters.length ?? 0} configurable inputs`} />
             <InfoTile
-              label="Scenario"
-              value={metadata.scenario_id != null ? String(metadata.scenario_id) : "Generated at inference time"}
+              label={isPhysical ? "Model kind" : "Scenario"}
+              value={
+                isPhysical
+                  ? solverSpec?.model_kind?.replace(/_/g, " ") ?? model?.model_kind?.replace(/_/g, " ") ?? "solver"
+                  : metadata.scenario_id != null ? String(metadata.scenario_id) : "Generated at inference time"
+              }
             />
           </div>
           <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">How to read it</p>
             <p className="mt-2 text-sm leading-6 text-zinc-400">
-              Inputs control the stochastic data-generating process. Inference produces forecast error metrics,
-              a final forecast level, trend slope, a forecast trace, and uncertainty bands. Use sweeps to test
-              sensitivity and MLOps to create lineage-backed artifacts.
+              {isPhysical
+                ? "Inputs are physical parameters with units. A solver run returns scalar scientific metrics, simulation traces, governing-equation metadata, and numerical status. Use sweeps to test parameter sensitivity and build surrogate-ready datasets."
+                : "Inputs control the stochastic data-generating process. Inference produces forecast error metrics, a final forecast level, trend slope, a forecast trace, and uncertainty bands. Use sweeps to test sensitivity and MLOps to create lineage-backed artifacts."}
             </p>
           </div>
+          {solverSpec?.governing_equations && (
+            <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Governing equations</p>
+              <p className="mt-2 font-mono text-xs leading-6 text-zinc-300">{solverSpec.governing_equations}</p>
+            </div>
+          )}
+          {solverSpec?.equations?.length ? (
+            <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Structured equation specs</p>
+              <div className="mt-3 space-y-3">
+                {solverSpec.equations.map((equation) => (
+                  <div key={equation.name} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-zinc-200">{equation.name.replace(/_/g, " ")}</p>
+                      <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-zinc-500">
+                        {equation.equation_type ?? "equation"}
+                      </span>
+                    </div>
+                    <p className="mt-2 font-mono text-xs leading-6 text-zinc-300">{equation.form}</p>
+                    {equation.residual ? (
+                      <p className="mt-1 font-mono text-[11px] leading-5 text-zinc-500">residual: {equation.residual}</p>
+                    ) : null}
+                    {(equation.variables?.length || equation.parameters?.length) ? (
+                      <p className="mt-2 text-[11px] leading-5 text-zinc-500">
+                        {equation.variables?.length ? `variables: ${equation.variables.join(", ")}` : ""}
+                        {equation.variables?.length && equation.parameters?.length ? " | " : ""}
+                        {equation.parameters?.length ? `parameters: ${equation.parameters.join(", ")}` : ""}
+                      </p>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </section>
 
         <section className="glass rounded-2xl p-6">
-          <SectionTitle icon={<Network className="h-4 w-4" />} title="Stochastic process stack" accentColor={accentColor} />
+          <SectionTitle icon={<Network className="h-4 w-4" />} title={isPhysical ? "Scientific method stack" : "Stochastic process stack"} accentColor={accentColor} />
           <div className="mt-4 flex flex-wrap gap-2">
-            {guide.stochasticCore.map((item) => (
+            {guide.methodCore.map((item) => (
               <span
                 key={item}
                 className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300"
@@ -162,9 +245,9 @@ export function SmartDocumentationPanel({
       </div>
 
       <section className="glass rounded-2xl p-6">
-        <SectionTitle icon={<Route className="h-4 w-4" />} title="Synthetic-data MLOps flow" accentColor={accentColor} />
+        <SectionTitle icon={<Route className="h-4 w-4" />} title={isPhysical ? "Solver analytics flow" : "Synthetic-data MLOps flow"} accentColor={accentColor} />
         <div className="mt-5 grid gap-3 lg:grid-cols-5">
-          {PIPELINE_STEPS.map(([title, text], index) => (
+          {pipelineSteps.map(([title, text], index) => (
             <div key={title} className="rounded-2xl border border-white/10 bg-black/20 p-4">
               <div
                 className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-black"
@@ -187,12 +270,24 @@ export function SmartDocumentationPanel({
         <section className="glass rounded-2xl p-6">
           <SectionTitle icon={<GitBranch className="h-4 w-4" />} title="Current lineage anchors" accentColor={accentColor} />
           <div className="mt-4 grid gap-2 font-mono text-xs">
-            <LineageAnchor label="Synthetic dataset" value={metadata.synthetic_dataset_id} />
-            <LineageAnchor label="Inference run" value={result?.run_id} />
+            <LineageAnchor label={isPhysical ? "Solver artifact" : "Synthetic dataset"} value={metadata.synthetic_dataset_id ?? metadata.artifact_role} />
+            <LineageAnchor label={isPhysical ? "Solver run" : "Inference run"} value={result?.run_id} />
             <LineageAnchor label="Model version" value={result?.model_version} />
           </div>
         </section>
       </div>
+      {solverSpec?.assumptions?.length ? (
+        <section className="glass rounded-2xl p-6">
+          <SectionTitle icon={<Database className="h-4 w-4" />} title="Solver assumptions" accentColor={accentColor} />
+          <div className="mt-4 grid gap-2 md:grid-cols-2">
+            {solverSpec.assumptions.map((assumption) => (
+              <div key={assumption} className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-zinc-400">
+                {assumption}
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

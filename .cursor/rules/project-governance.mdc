@@ -1,0 +1,13 @@
+---
+description: Core governance rules for Khukra
+alwaysApply: true
+---
+
+# Project Governance
+
+- Read nearby code and docs before editing; follow existing module boundaries.
+- Do not commit or modify generated runtime data unless explicitly requested: `data/**`, `frontend/data/**`, `frontend/.next/**`, `.pytest_cache/**`.
+- Never add secrets, `.env`, `.env.local`, credentials, tokens, or production passwords.
+- For behavioral changes, update or add tests and mention validation in the final response.
+- For API, storage, lineage, release, or architecture changes, update the relevant docs: `GOVERNANCE.md`, `docs/governance-framework.md`, `docs/data-governance.md`, `docs/versioning.md`, or an ADR.
+- Keep changes focused; avoid unrelated refactors in governance, CI, and release work.

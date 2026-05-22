@@ -34,6 +34,7 @@ class InferenceModelSpec:
     feature_schema: list[FeatureField]
     output_schema: list[OutputField]
     supports_uncertainty: bool = False
+    model_kind: str | None = None
 
 
 @dataclass

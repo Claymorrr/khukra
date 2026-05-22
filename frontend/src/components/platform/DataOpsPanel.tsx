@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { getStoredToken } from "@/lib/auth";
-import { v1ListProducts } from "@/lib/api/v1";
-import type { DataProductInfo } from "@/lib/types";
+import { v1GetDomainLake, v1ListLakeAssets } from "@/lib/api/v1";
+import type { LakeAssetInfo } from "@/lib/types";
 
 interface DataOpsPanelProps {
   domainId: string;
@@ -28,23 +28,26 @@ async function governanceFetch<T>(path: string): Promise<T> {
 }
 
 export function DataOpsPanel({ domainId, accentColor }: DataOpsPanelProps) {
-  const [products, setProducts] = useState<DataProductInfo[]>([]);
+  const [assets, setAssets] = useState<LakeAssetInfo[]>([]);
   const [contracts, setContracts] = useState<ContractRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const [prodRes, contractRes] = await Promise.all([
-        v1ListProducts(domainId),
+      const [lakeRes, researchRes, contractRes] = await Promise.all([
+        v1GetDomainLake(domainId),
+        v1ListLakeAssets(domainId, "research"),
         governanceFetch<{ contracts: ContractRow[] }>(
           `/contracts?domain=${encodeURIComponent(domainId)}`
         ),
       ]);
-      setProducts(prodRes.products);
+      const devRes = await v1ListLakeAssets(domainId, "development");
+      setAssets([...researchRes.assets, ...devRes.assets]);
       setContracts(contractRes.contracts);
+      void lakeRes;
     } catch {
-      setProducts([]);
+      setAssets([]);
       setContracts([]);
     } finally {
       setLoading(false);
@@ -55,8 +58,8 @@ export function DataOpsPanel({ domainId, accentColor }: DataOpsPanelProps) {
     refresh();
   }, [refresh]);
 
-  const passed = products.filter((p) => p.quality_status === "passed").length;
-  const linked = products.filter((p) => p.lineage_status === "linked" || p.lineage_status === "registered").length;
+  const passed = assets.filter((p) => p.quality_status === "passed").length;
+  const linked = assets.filter((p) => p.lineage_status === "linked" || p.lineage_status === "registered").length;
 
   return (
     <div className="space-y-6">
@@ -65,7 +68,7 @@ export function DataOpsPanel({ domainId, accentColor }: DataOpsPanelProps) {
         <div>
           <h2 className="text-lg font-semibold">DataOps</h2>
           <p className="text-sm text-zinc-500">
-            Contracts, quality gates, freshness, and promotion readiness for {domainId}.
+            Lake governance: contracts, quality, freshness, and readiness for {domainId}.
           </p>
         </div>
       </div>
@@ -78,7 +81,7 @@ export function DataOpsPanel({ domainId, accentColor }: DataOpsPanelProps) {
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
-            <MetricCard label="Products" value={products.length} accent={accentColor} />
+            <MetricCard label="Lake assets" value={assets.length} accent={accentColor} />
             <MetricCard label="Quality passed" value={passed} accent={accentColor} ok={passed > 0} />
             <MetricCard label="Lineage linked" value={linked} accent={accentColor} ok={linked > 0} />
           </div>
@@ -103,11 +106,11 @@ export function DataOpsPanel({ domainId, accentColor }: DataOpsPanelProps) {
           </section>
 
           <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-            <h3 className="text-sm font-medium text-zinc-300">Product readiness</h3>
+            <h3 className="text-sm font-medium text-zinc-300">Lake readiness</h3>
             <ul className="mt-3 space-y-2">
-              {products.slice(0, 12).map((p) => (
+              {assets.slice(0, 12).map((p) => (
                 <li
-                  key={p.product_id}
+                  key={p.lake_asset_id}
                   className="flex items-center gap-2 rounded-lg border border-white/5 px-3 py-2 text-xs"
                 >
                   {p.quality_status === "passed" ? (
@@ -116,6 +119,7 @@ export function DataOpsPanel({ domainId, accentColor }: DataOpsPanelProps) {
                     <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
                   )}
                   <span className="flex-1 truncate">{p.name}</span>
+                  <span className="text-zinc-600">{p.lake_space}</span>
                   <span className="text-zinc-600">{p.quality_status}</span>
                   <span className="font-mono text-zinc-600">{p.version_label}</span>
                 </li>

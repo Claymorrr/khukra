@@ -1,0 +1,14 @@
+---
+description: Documentation and ADR conventions for Khukra
+globs: docs/**/*.md,*.md
+alwaysApply: false
+---
+
+# Docs Governance
+
+- Keep README concise; place detailed policy in `docs/`.
+- Use ADRs in `docs/adr/` for durable architecture decisions.
+- Update `CHANGELOG.md` for user-visible changes and release notes.
+- Keep `docs/roadmap.md` focused on phases, priorities, and open work.
+- Link related docs instead of duplicating large sections.
+- Avoid documenting generated local data as committed source.

@@ -68,7 +68,7 @@ export function CatalogSelectors({
       >
         {subdomain?.models.map((m) => (
           <option key={m.id} value={m.id}>
-            {m.label}
+            {m.label}{m.model_kind ? ` (${m.model_kind.replace(/_/g, " ")})` : ""}
           </option>
         ))}
       </select>

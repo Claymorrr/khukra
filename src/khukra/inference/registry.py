@@ -10,16 +10,175 @@ _COMMON_OUTPUTS = [
     ("trend_slope", "Trend slope", "/step"),
 ]
 
+_FORECAST_OUTPUTS = [
+    ("forecast_mae", "Forecast MAE", ""),
+    ("forecast_rmse", "Forecast RMSE", ""),
+    ("final_level", "Final forecast level", ""),
+    ("trend_slope", "Trend slope", "/step"),
+]
+
+def _physical_model_meta() -> dict[str, dict[str, Any]]:
+    from khukra.domains.physical.models_registry import SOLVER_SPECS, inference_meta_for
+
+    return {model_id: inference_meta_for(model_id) for model_id in SOLVER_SPECS}
+
+
+_FINANCE_OUTPUTS: dict[str, list[tuple[str, str, str]]] = {
+    "market": [
+        ("forecast_mae", "Forecast MAE", ""),
+        ("liquidity_score", "Liquidity score", ""),
+        ("regime_volatility", "Regime volatility", ""),
+        ("signal_score", "Signal score", ""),
+    ],
+    "signal": [
+        ("forecast_mae", "Forecast MAE", ""),
+        ("signal_score", "Signal score", ""),
+        ("expected_return", "Expected return (annualized proxy)", ""),
+        ("half_life_bars", "Alpha half-life (bars)", ""),
+    ],
+    "backtest": [
+        ("forecast_mae", "Forecast MAE", ""),
+        ("sharpe_ratio", "Sharpe ratio", ""),
+        ("hit_rate", "Hit rate", ""),
+        ("max_drawdown", "Max drawdown", ""),
+        ("turnover_proxy", "Turnover proxy", ""),
+        ("exposure", "Exposure", ""),
+    ],
+    "execution": [
+        ("forecast_mae", "Forecast MAE", ""),
+        ("slippage_bps", "Slippage (bps proxy)", ""),
+        ("fill_rate", "Fill rate", ""),
+        ("market_impact_proxy", "Market impact proxy", ""),
+    ],
+    "risk": [
+        ("forecast_mae", "Forecast MAE", ""),
+        ("max_drawdown", "Max drawdown", ""),
+        ("var_proxy", "VaR proxy", ""),
+        ("risk_envelope", "Risk envelope", ""),
+    ],
+    "delivery": [
+        ("forecast_mae", "Forecast MAE", ""),
+        ("readiness_score", "Readiness score", ""),
+        ("gate_passed", "Gate passed", ""),
+        ("release_status", "Release status", ""),
+    ],
+    "allocation": [
+        ("portfolio_return", "Portfolio return", ""),
+        ("portfolio_risk", "Portfolio risk", ""),
+        ("sharpe_ratio", "Sharpe ratio", ""),
+        ("max_drawdown", "Max drawdown", ""),
+        ("var_proxy", "VaR proxy", ""),
+    ],
+}
+
+_FINANCE_MODEL_META: dict[str, dict[str, Any]] = {
+    "market_scenario_research": {
+        "type": "trading_market_scenario",
+        "lifecycle": "market",
+        "outputs": _FINANCE_OUTPUTS["market"],
+    },
+    "liquidity_regime_forecast": {
+        "type": "trading_liquidity_regime",
+        "lifecycle": "market",
+        "outputs": _FINANCE_OUTPUTS["market"],
+    },
+    "spread_signal_research": {
+        "type": "trading_stat_arb_signal",
+        "lifecycle": "signal",
+        "outputs": _FINANCE_OUTPUTS["signal"],
+    },
+    "alpha_decay_signal": {
+        "type": "trading_alpha_decay",
+        "lifecycle": "signal",
+        "outputs": _FINANCE_OUTPUTS["signal"],
+    },
+    "strategy_backtest_validation": {
+        "type": "trading_backtest_validation",
+        "lifecycle": "backtest",
+        "outputs": _FINANCE_OUTPUTS["backtest"],
+    },
+    "sharpe_ratio_backtest": {
+        "type": "trading_sharpe_backtest",
+        "lifecycle": "backtest",
+        "outputs": _FINANCE_OUTPUTS["backtest"],
+    },
+    "execution_slippage_sim": {
+        "type": "trading_execution_slippage",
+        "lifecycle": "execution",
+        "outputs": _FINANCE_OUTPUTS["execution"],
+    },
+    "paper_order_fill_sim": {
+        "type": "trading_paper_fill",
+        "lifecycle": "execution",
+        "outputs": _FINANCE_OUTPUTS["execution"],
+    },
+    "drawdown_envelope_risk": {
+        "type": "trading_drawdown_risk",
+        "lifecycle": "risk",
+        "outputs": _FINANCE_OUTPUTS["risk"],
+    },
+    "portfolio_risk_envelope": {
+        "type": "trading_portfolio_risk",
+        "lifecycle": "risk",
+        "outputs": _FINANCE_OUTPUTS["risk"],
+    },
+    "portfolio_allocation_optimizer": {
+        "type": "trading_portfolio_optimizer",
+        "lifecycle": "risk",
+        "outputs": _FINANCE_OUTPUTS["allocation"],
+        "uncertainty": False,
+    },
+    "strategy_release_readiness": {
+        "type": "trading_release_readiness",
+        "lifecycle": "delivery",
+        "outputs": _FINANCE_OUTPUTS["delivery"],
+    },
+    "paper_trading_delivery_gate": {
+        "type": "trading_paper_delivery_gate",
+        "lifecycle": "delivery",
+        "outputs": _FINANCE_OUTPUTS["delivery"],
+    },
+}
+
 _MODEL_META: dict[str, dict[str, Any]] = {
-    "turbomachinery_health_forecast": {"type": "stochastic_degradation_jump_diffusion", "uncertainty": True},
-    "combustion_instability_forecast": {"type": "stochastic_regime_hawkes_combustion", "uncertainty": True},
-    "hybrid_propulsion_mission_forecast": {"type": "stochastic_control_regime_forecast", "uncertainty": True},
-    "lob_liquidity_forecast": {"type": "stochastic_microstructure_hawkes", "uncertainty": True},
-    "spread_mean_reversion_forecast": {"type": "stochastic_arbitrage_regime_jump", "uncertainty": True},
-    "execution_slippage_forecast": {"type": "stochastic_execution_cost_process", "uncertainty": True},
-    "defect_rate_forecast": {"type": "stochastic_quality_drift_process", "uncertainty": True},
-    "disruption_risk_forecast": {"type": "stochastic_hawkes_disruption_process", "uncertainty": True},
-    "recovery_time_forecast": {"type": "stochastic_resilience_shock_process", "uncertainty": True},
+    **_physical_model_meta(),
+    **_FINANCE_MODEL_META,
+    "defect_rate_forecast": {
+        "type": "supply_chain_quality_simulation",
+        "uncertainty": True,
+        "outputs": [
+            ("defect_rate", "Defect rate", ""),
+            ("cpk_min", "Minimum Cpk", ""),
+            ("escape_risk", "Escape risk", ""),
+            ("warranty_exposure_p90", "Warranty exposure P90", ""),
+            ("forecast_mae", "Forecast MAE", ""),
+            ("forecast_rmse", "Forecast RMSE", ""),
+        ],
+    },
+    "disruption_risk_forecast": {
+        "type": "supply_chain_disruption_simulation",
+        "uncertainty": True,
+        "outputs": [
+            ("global_risk_index", "Global risk index", ""),
+            ("expected_delay_days", "Expected delay (days)", "days"),
+            ("supplier_contagion", "Supplier contagion", ""),
+            ("port_delay_p95", "Port delay P95", ""),
+            ("forecast_mae", "Forecast MAE", ""),
+            ("forecast_rmse", "Forecast RMSE", ""),
+        ],
+    },
+    "recovery_time_forecast": {
+        "type": "supply_chain_resilience_simulation",
+        "uncertainty": True,
+        "outputs": [
+            ("recovery_days_p50", "Recovery days P50", "days"),
+            ("recovery_days_p90", "Recovery days P90", "days"),
+            ("service_level_at_risk", "Service level at risk", ""),
+            ("buffer_utilization", "Buffer utilization", ""),
+            ("forecast_mae", "Forecast MAE", ""),
+            ("forecast_rmse", "Forecast RMSE", ""),
+        ],
+    },
     "multi_source_detection_forecast": {"type": "stochastic_signal_fusion_belief_system", "uncertainty": True},
     "narrative_cascade_forecast": {"type": "stochastic_influence_diffusion_system", "uncertainty": True},
     "early_warning_forecast": {"type": "stochastic_adversarial_warning_system", "uncertainty": True},
@@ -50,6 +209,10 @@ def _build_spec(domain: str, subdomain: str, model_id: str) -> InferenceModelSpe
         model_id,
         {"type": "synthetic_forecast", "version": "2.0.0", "uncertainty": True, "outputs": _COMMON_OUTPUTS},
     )
+    if domain == "physical":
+        from khukra.domains.physical.models_registry import model_kind
+
+        meta = {**meta, "model_kind": meta.get("model_kind") or model_kind(model_id)}
 
     features = [
         FeatureField(
@@ -77,7 +240,8 @@ def _build_spec(domain: str, subdomain: str, model_id: str) -> InferenceModelSpe
         description=SUBDOMAIN_LABELS[domain][subdomain],
         feature_schema=features,
         output_schema=outputs,
-        supports_uncertainty=True,
+        supports_uncertainty=bool(meta.get("uncertainty", True)),
+        model_kind=meta.get("model_kind"),
     )
 
 

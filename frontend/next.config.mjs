@@ -8,14 +8,11 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: apiBase,
   },
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${apiBase}/api/:path*`,
-      },
-    ];
+  // Avoid stale/missing lucide-react vendor chunks in dev (barrel import tree-shaking).
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
   },
+  // /api/* is proxied by src/app/api/[...path]/route.ts (more reliable than rewrites for large JSON).
 };
 
 export default nextConfig;

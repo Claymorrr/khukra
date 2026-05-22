@@ -12,7 +12,6 @@ import {
   Loader2,
   LogOut,
   Play,
-  Sparkles,
   Truck,
 } from "lucide-react";
 import { createInference, getCatalog, getStats, listRuns } from "@/lib/api";
@@ -33,6 +32,7 @@ import { AnalyticsWorkbench } from "../platform/AnalyticsWorkbench";
 import { DataHub } from "../platform/DataHub";
 import { DataGenerationStudio } from "../platform/DataGenerationStudio";
 import { KnowledgePanel } from "../platform/KnowledgePanel";
+import { KhukraLogo } from "@/components/brand/KhukraLogo";
 import { InsightsEngineering } from "../platform/InsightsEngineering";
 import { MLInferencingPanel } from "../platform/MLInferencingPanel";
 import { DevOpsPanel, InfraOpsPanel } from "../platform/OpsReadinessPanel";
@@ -218,6 +218,9 @@ export function DomainShell({
     ...DOMAIN_MODULES.filter((mod) => !moduleOrder.includes(mod.id)),
   ];
   const ActivePlatformPanel = PLATFORM_PANELS[moduleFromUrl];
+  const isPhysicsSolver = ctx.domain.id === "physical";
+  const runVerb = isPhysicsSolver ? "Solve" : "Infer";
+  const runNoun = isPhysicsSolver ? "solver run" : "inference";
   const showScenarioControls = ![
     "overview",
     "data_hub",
@@ -235,10 +238,7 @@ export function DomainShell({
     <div className="flex h-screen overflow-hidden bg-[#07090d]">
       <aside className="flex w-56 shrink-0 flex-col border-r border-white/10 bg-black/40">
         <div className="border-b border-white/10 px-4 py-5">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-zinc-500">
-            <Sparkles className="h-4 w-4" style={{ color: accent }} />
-            Khukra
-          </p>
+          <KhukraLogo accentColor={accent} subtitle="Domain workspace" />
           <button
             type="button"
             onClick={() => router.push("/")}
@@ -300,7 +300,7 @@ export function DomainShell({
                 style={{ backgroundColor: accent }}
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 fill-current" />}
-                Infer
+                {runVerb}
               </button>
             )}
           </div>
@@ -353,8 +353,8 @@ export function DomainShell({
 
             {moduleFromUrl === "inference" && (
               <p className="text-sm text-zinc-500">
-                Configure parameters above, then press <strong className="text-zinc-300">Infer</strong> to run the
-                selected model. Results appear in the Results tab.
+                Configure parameters above, then press <strong className="text-zinc-300">{runVerb}</strong> to run the
+                selected {isPhysicsSolver ? "physics solver" : "model"}. Results appear in the Results tab.
               </p>
             )}
 
@@ -383,7 +383,7 @@ export function DomainShell({
                     )}
                   </>
                 ) : (
-                  <p className="text-sm text-zinc-500">No inference yet. Run Infer from the Models & Inference tab.</p>
+                  <p className="text-sm text-zinc-500">No {runNoun} yet. Run {runVerb} from the Models & Solvers tab.</p>
                 )}
               </div>
             )}
@@ -435,3 +435,4 @@ export function DomainShell({
     </div>
   );
 }
+

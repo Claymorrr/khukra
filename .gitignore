@@ -23,6 +23,8 @@ build/
 node_modules/
 frontend/.next/
 frontend/out/
+frontend/.env.local
+frontend/tsconfig.tsbuildinfo
 
 # Python API / frontend
 .venv/
@@ -44,5 +46,6 @@ data/synthetic/
 data/warehouse/
 data/datasets/
 data/exports/
+data/features/
 !data/.gitkeep
 frontend/data/

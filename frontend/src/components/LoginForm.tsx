@@ -6,11 +6,11 @@ import {
   Loader2,
   LockKeyhole,
   LogIn,
-  Sparkles,
   UserPlus,
 } from "lucide-react";
 import { login, register } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { KhukraMark } from "@/components/brand/KhukraLogo";
 
 export function LoginForm() {
   const { login: setAuth } = useAuth();
@@ -52,7 +52,7 @@ export function LoginForm() {
       <div className="relative w-full max-w-md">
         <header className="mb-8 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
-            <Sparkles className="h-6 w-6 text-sky-300" />
+            <KhukraMark className="h-8 w-8 text-white" accentColor="#7dd3fc" />
           </div>
           <p className="mt-5 text-xs uppercase tracking-[0.32em] text-zinc-600">Khukra</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white">Work by domain.</h1>

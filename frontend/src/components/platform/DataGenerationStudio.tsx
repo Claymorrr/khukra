@@ -105,6 +105,7 @@ export function DataGenerationStudio({ accentColor, domainId }: DataGenerationSt
   const schemaCols = selectedDataset?.column_schema
     ? Object.entries(selectedDataset.column_schema)
     : [];
+  const isPhysical = domainId === "physical";
 
   return (
     <div className="space-y-6">
@@ -135,7 +136,7 @@ export function DataGenerationStudio({ accentColor, domainId }: DataGenerationSt
           style={{ backgroundColor: accentColor }}
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-          Generate synthetic dataset
+          {isPhysical ? "Generate solver dataset" : "Generate synthetic dataset"}
         </button>
         {(error || catalogError) && (
           <p className="mt-3 text-sm text-red-400">{error ?? catalogError}</p>
@@ -146,7 +147,7 @@ export function DataGenerationStudio({ accentColor, domainId }: DataGenerationSt
         <section className="glass rounded-2xl border border-white/10 p-5 text-sm">
           <p className="font-medium text-zinc-200">Last generation</p>
           <p className="mt-2 font-mono text-xs text-zinc-500">
-            dataset: {String(lastResult.synthetic_dataset_id ?? "—")}
+            dataset: {String(lastResult.synthetic_dataset_id ?? lastResult.product_id ?? "—")}
           </p>
           {lastResult.validation != null && (
             <p className="mt-1 text-xs text-emerald-400/90">
@@ -159,7 +160,7 @@ export function DataGenerationStudio({ accentColor, domainId }: DataGenerationSt
       <section className="glass rounded-2xl p-5">
         <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-200">
           <Rows3 className="h-4 w-4" style={{ color: accentColor }} />
-          Saved synthetic datasets
+          {isPhysical ? "Saved solver datasets" : "Saved synthetic datasets"}
         </h4>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left text-xs text-zinc-500">

@@ -19,7 +19,7 @@ export type DomainModule =
 
 export const DOMAIN_MODULES: Array<{ id: DomainModule; label: string }> = [
   { id: "overview", label: "Overview" },
-  { id: "inference", label: "Models & Inference" },
+  { id: "inference", label: "Models & Solvers" },
   { id: "results", label: "Results" },
   { id: "sweeps", label: "Sweeps" },
   { id: "compare", label: "Compare" },

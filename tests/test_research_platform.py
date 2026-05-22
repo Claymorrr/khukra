@@ -9,15 +9,20 @@ from khukra.inference.registry import get_registry, model_key
 from khukra.services.mlops_pipeline import MLOpsPipeline
 
 
-def test_five_domains_twenty_models():
+def test_five_domains_twenty_six_models():
     assert len(list_domains()) == 5
     total = sum(
         len(list_models(d, s))
         for d in list_domains()
         for s in list_subdomains(d)
     )
-    assert total == 20
-    assert "aerodesign" in list_subdomains("physical")
+    assert total == 26
+    assert len(list_models("finance", "market_research")) == 2
+    assert len(list_models("finance", "strategy_delivery")) == 2
+    physical_subs = list_subdomains("physical")
+    assert "mechanics" in physical_subs
+    assert "thermofluid" in physical_subs
+    assert "dynamics" in physical_subs
 
 
 def test_inference_registry_covers_all_models():
@@ -26,20 +31,6 @@ def test_inference_registry_covers_all_models():
         for subdomain, models in subs.items():
             for model_id in models:
                 assert model_key(domain, subdomain, model_id) in reg
-
-
-def test_inference_predict_physical():
-    engine = get_inference_engine()
-    result = engine.predict(
-        "physical",
-        "turbomachinery_degradation",
-        "turbomachinery_health_forecast",
-        {"seed": 7, "history_length": 80, "forecast_horizon": 12},
-    )
-    assert result.inference_id
-    assert "forecast_mae" in result.predictions_flat()
-    assert result.metadata.get("synthetic_dataset_id")
-    assert "forecast" in result.traces
 
 
 def test_mlops_pipeline():

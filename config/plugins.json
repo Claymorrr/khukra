@@ -1,9 +1,9 @@
 [
   {
-    "id": "data_hub",
-    "label": "Data Hub",
-    "description": "Product catalog, contracts, freshness, and lineage.",
-    "route_id": "data_hub",
+    "id": "domain_lake",
+    "label": "Domain Lake",
+    "description": "Research and product development lake per domain.",
+    "route_id": "domain_lake",
     "icon": "database",
     "order": 2,
     "capabilities": ["catalog", "contracts", "lineage", "quality"],

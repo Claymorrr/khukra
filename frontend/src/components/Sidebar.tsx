@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { Box, Brain, ChevronRight, Cpu, Layers, LineChart, Truck } from "lucide-react";
+import { Box, Brain, ChevronRight, Cpu, LineChart, Truck } from "lucide-react";
+import { KhukraLogo } from "@/components/brand/KhukraLogo";
 import type { CatalogResponse, Selection } from "@/lib/types";
 
 const DOMAIN_ICONS: Record<string, typeof Box> = {
@@ -22,19 +23,11 @@ export function Sidebar({ catalog, selection, onSelect }: SidebarProps) {
   return (
     <aside className="flex h-full w-80 shrink-0 flex-col border-r border-border bg-surface-raised/85 backdrop-blur-xl">
       <div className="border-b border-border px-5 py-6">
-        <div className="flex items-center gap-2">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10">
-            <Layers className="h-6 w-6 text-[var(--accent)]" />
-          </div>
-          <div>
-            <h1 className="text-base font-semibold tracking-wide">Khukra</h1>
-            <p className="text-xs text-zinc-500">Research MLOps cockpit</p>
-          </div>
-        </div>
+        <KhukraLogo accentColor="var(--accent)" subtitle="Research MLOps cockpit" />
         <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-3">
           <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-600">Workflow</p>
           <p className="mt-1 text-xs leading-5 text-zinc-400">
-            Synthetic data → stochastic inference → optimization-ready evidence.
+            Solvers and inference to traces, metrics, lineage, and evidence.
           </p>
         </div>
       </div>

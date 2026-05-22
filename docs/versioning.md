@@ -11,6 +11,8 @@ Khukra tracks **stable entity IDs** plus **version labels** so domain work stays
 | Synthetic dataset | `dataset_id` | Per-generation semver | `entity_versions` + `synthetic_datasets.version_label` |
 | Model artifact | `{domain}:{subdomain}:{model_id}` | Registry version | `entity_versions` + `model_artifacts.version` |
 | API / catalog | — | `catalog.schema_version` | `VersioningSummaryResponse` |
+| Finance strategy bundle | `finance:strategy:{id}` | Semver | planned (#28) — signal + backtest + release lineage |
+| Finance backtest run | `finance:backtest:{run_id}` | Immutable run label | `simulation_runs` + lake assets |
 
 ## Registry
 

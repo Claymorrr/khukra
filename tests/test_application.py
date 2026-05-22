@@ -10,6 +10,7 @@ def test_app_container_singleton():
     assert a is b
     assert a.products is not None
     assert a.workflows is not None
+    assert a.workloads is not None
 
 
 def test_lineage_graph_structure():

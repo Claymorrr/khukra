@@ -15,6 +15,9 @@ export interface ModelInfo {
   id: string;
   label: string;
   parameters: ParameterSchema[];
+  model_kind?: string;
+  predictor_type?: string;
+  solver_spec?: Record<string, unknown>;
 }
 
 export interface SubdomainInfo {
@@ -73,6 +76,58 @@ export interface DataProductDetail extends DataProductInfo {
   preview?: { columns: string[]; rows: Array<Record<string, unknown>> } | null;
   knowledge_assets: KnowledgeAssetInfo[];
   saved_queries: SavedQueryInfo[];
+}
+
+/** Domain research / product development lake asset */
+export interface LakeAssetInfo {
+  lake_asset_id: string;
+  name: string;
+  lake_space: "research" | "development" | string;
+  asset_kind: string;
+  domain: string;
+  source_type: string;
+  source_id: string;
+  legacy_product_id?: string | null;
+  storage_uri?: string | null;
+  row_count?: number | null;
+  column_schema: Record<string, string>;
+  contract_id?: string | null;
+  version_label: string;
+  quality_status: string;
+  lineage_status: string;
+  metadata: Record<string, unknown>;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface DomainLakeSummary {
+  domain: string;
+  research_lake: {
+    assets: LakeAssetInfo[];
+    total: number;
+    artifacts: Array<Record<string, unknown>>;
+  };
+  product_development_lake: {
+    assets: LakeAssetInfo[];
+    total: number;
+    artifacts: Array<Record<string, unknown>>;
+  };
+  totals: {
+    lake_assets: number;
+    research_artifacts: number;
+    development_artifacts: number;
+  };
+}
+
+export interface DomainLakeDetail extends LakeAssetInfo {
+  versions: Array<Record<string, unknown>>;
+  lineage_edges: Array<Record<string, unknown>>;
+  profile?: Record<string, unknown> | null;
+  preview?: { columns: string[]; rows: Array<Record<string, unknown>> } | null;
+  knowledge_assets: KnowledgeAssetInfo[];
+  saved_queries: SavedQueryInfo[];
+  research_artifacts: Array<Record<string, unknown>>;
+  development_artifacts: Array<Record<string, unknown>>;
 }
 
 export interface KnowledgeAssetInfo {

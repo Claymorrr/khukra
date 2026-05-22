@@ -28,6 +28,7 @@ def test_mlops_templates_domain_filter():
 
     svc = MLOpsTemplateService()
     physical = svc.list_templates(domain="physical")
-    assert any("aerodesign" in t["id"] for t in physical)
+    assert any("physics" in t["id"] for t in physical)
     finance = svc.list_templates(domain="finance")
-    assert any("quant" in t["id"] for t in finance)
+    assert "quant_research_loop" in {t["id"] for t in finance}
+    assert "paper_trading_delivery" in {t["id"] for t in finance}

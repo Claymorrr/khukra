@@ -8,12 +8,12 @@ def test_ml_inference_predict_physical():
     svc = MLInferenceService()
     out = svc.predict(
         "physical",
-        "turbomachinery_degradation",
-        "turbomachinery_health_forecast",
-        {"seed": 11, "history_length": 60, "forecast_horizon": 8},
+        "mechanics",
+        "cantilever_beam",
+        {"load": 1100.0},
     )
     assert out.inference_id
-    assert "forecast_mae" in out.predictions_flat()
+    assert "max_deflection_mm" in out.predictions_flat()
     assert out.traces
 
 

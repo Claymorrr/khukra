@@ -41,7 +41,7 @@ export function PlatformOverview({
           {summary?.headline ?? "Platform health snapshot"}
         </h3>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-          {domainLabel}: synthetic data generation, MLOps orchestration, ML inferencing,
+          {domainLabel}: solver/data generation, MLOps orchestration, ML inferencing,
           DuckDB analytics, and insights scoped to this domain.
         </p>
         <p className="mt-2 text-xs text-zinc-600">Active domain: {domainId}</p>

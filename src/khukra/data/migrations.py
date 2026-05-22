@@ -377,6 +377,84 @@ MIGRATIONS: list[tuple[int, str]] = [
         CREATE INDEX IF NOT EXISTS idx_product_snapshots_product ON product_version_snapshots(product_id);
         """,
     ),
+    (
+        8,
+        """
+        CREATE TABLE IF NOT EXISTS lake_assets (
+            lake_asset_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            updated_at TIMESTAMP NOT NULL,
+            name VARCHAR NOT NULL,
+            lake_space VARCHAR NOT NULL,
+            asset_kind VARCHAR NOT NULL,
+            domain VARCHAR NOT NULL,
+            source_type VARCHAR NOT NULL,
+            source_id VARCHAR NOT NULL,
+            legacy_product_id VARCHAR,
+            storage_uri VARCHAR,
+            row_count INTEGER,
+            column_schema JSON,
+            contract_id VARCHAR,
+            version_label VARCHAR DEFAULT '1.0.0',
+            quality_status VARCHAR DEFAULT 'unknown',
+            lineage_status VARCHAR DEFAULT 'partial',
+            metadata JSON
+        );
+
+        CREATE TABLE IF NOT EXISTS research_artifacts (
+            artifact_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            lake_asset_id VARCHAR,
+            domain VARCHAR NOT NULL,
+            artifact_type VARCHAR NOT NULL,
+            title VARCHAR NOT NULL,
+            content JSON,
+            version_label VARCHAR DEFAULT '1.0.0',
+            user_id VARCHAR
+        );
+
+        CREATE TABLE IF NOT EXISTS development_artifacts (
+            artifact_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            lake_asset_id VARCHAR,
+            domain VARCHAR NOT NULL,
+            artifact_type VARCHAR NOT NULL,
+            title VARCHAR NOT NULL,
+            content JSON,
+            version_label VARCHAR DEFAULT '1.0.0',
+            user_id VARCHAR
+        );
+
+        CREATE TABLE IF NOT EXISTS experiment_records (
+            experiment_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            domain VARCHAR NOT NULL,
+            lake_asset_id VARCHAR,
+            workflow_run_id VARCHAR,
+            status VARCHAR DEFAULT 'completed',
+            metadata JSON
+        );
+
+        CREATE TABLE IF NOT EXISTS decision_records (
+            decision_id VARCHAR PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL,
+            domain VARCHAR NOT NULL,
+            lake_asset_id VARCHAR,
+            title VARCHAR NOT NULL,
+            outcome VARCHAR,
+            metadata JSON
+        );
+
+        ALTER TABLE knowledge_assets ADD COLUMN IF NOT EXISTS lake_asset_id VARCHAR;
+        ALTER TABLE saved_queries ADD COLUMN IF NOT EXISTS lake_asset_id VARCHAR;
+        ALTER TABLE workflow_runs ADD COLUMN IF NOT EXISTS lake_asset_id VARCHAR;
+
+        CREATE INDEX IF NOT EXISTS idx_lake_assets_domain ON lake_assets(domain);
+        CREATE INDEX IF NOT EXISTS idx_lake_assets_space ON lake_assets(lake_space);
+        CREATE INDEX IF NOT EXISTS idx_research_artifacts_domain ON research_artifacts(domain);
+        CREATE INDEX IF NOT EXISTS idx_development_artifacts_domain ON development_artifacts(domain);
+        """,
+    ),
 ]
 
 

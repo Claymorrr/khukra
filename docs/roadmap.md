@@ -5,7 +5,10 @@ Strategic plan for deployment, production hardening, and future features. **Acti
 Related docs:
 
 - [Deployment plan](./deployment-plan.md) — checklist and environment decisions
+- [Governance framework](./governance-framework.md) — decision model, quality gates, release checks
+- [Data governance](./data-governance.md) — lake zones, lineage, retention, generated file policy
 - [Session summary (2026-05-20)](./session-summary-2026-05-20.md) — MVP baseline
+- [Physical Systems platform](./physical-systems.md) — physics solvers, analytics, surrogates
 
 ## How we track work
 
@@ -15,6 +18,7 @@ Related docs:
 | **Project board** | GitHub Projects | Backlog → In progress → Done |
 | **Roadmap** | This file | Themes, phases, priorities |
 | **Deployment** | `deployment-plan.md` | Hosting, env, CI/CD, go-live |
+| **Governance** | `GOVERNANCE.md`, `docs/governance-framework.md` | Quality, release, architecture, data policy |
 
 **Labels:** `deployment`, `feature`, `backend`, `frontend`, `platform`, `research`, `mlops`, `security`, `ci-cd`, `docs`, `priority-high`
 
@@ -28,14 +32,17 @@ Local-first research + platform workspaces, FastAPI, Next.js, DuckDB/Parquet, au
 
 ## App navigation (done)
 
-Khukra is **domain-first** end-to-end:
+Khukra is a **domain operating environment** end-to-end:
 
-- `/` — choose domain (Physical, Finance, Supply Chain, Intelligence, Computing)
-- `/domain/<domainId>?module=<capability>` — unified workspace per domain
-- Capabilities in one shell: overview, inference, results, sweeps, compare, docs, history, datasets, data generation, MLOps, ML inferencing, analytics, insights
-- `/research` and `/platform` redirect to domain routes for compatibility
+- `/` — choose domain environment (all five domains active)
+- `/d/<domainId>/workflows` — **Domain Cockpit** (default): develop → validate → package → operate
+- `/d/<domainId>/data` — domain data plane (lake assets, data ops)
+- `/d/<domainId>/knowledge` — knowledge and evidence
+- `/d/<domainId>/operations` — infra/dev readiness
+- API: `/api/v1/domains/{domain}/workloads/*` plus legacy inference/lake routes
+- `/domain/<domainId>` and `/research` redirect for compatibility
 
-**Aerodesign** is a Physical Systems subdomain (`aerodesign` / `aerodynamic_performance_forecast`).
+**Physical Systems** is a physics-solver domain (`mechanics`, `thermofluid`, `dynamics`).
 
 ---
 
@@ -51,29 +58,30 @@ Each domain carries manifest metadata that shapes how it appears and how future 
 
 Priority domains:
 
-- **Physical Systems**: advanced Aerodesign operating environment
-- **Finance**: Quant Trading research and operations environment
+- **Physical Systems**: physics solvers, validation metrics, sweeps, and surrogate predictors — see [physical-systems.md](./physical-systems.md)
+- **Finance**: Automated trading R&D — continuous research, backtest gates, paper delivery — see [finance-quant-trading.md](./finance-quant-trading.md)
 
 ## Solution architecture remodel (in progress)
 
-Khukra is becoming a **Data Product OS** with explicit bounded contexts:
+Khukra is a **domain research and product development platform** with a governed **knowledge & development lake** per domain:
 
 | Layer | Location | Responsibility |
 |-------|----------|----------------|
-| **Application** | `src/khukra/application/` | Products, workflows, governance, lineage, knowledge use cases |
-| **API v1** | `/api/v1/*` | Product-centric control plane (legacy `/api/*` wraps use cases) |
+| **Application** | `src/khukra/application/` | Domain lake, workflows, governance, lineage, knowledge |
+| **API v1** | `/api/v1/domains/{domain}/lake/*` | Research lake + product development lake control plane |
 | **Workflow runs** | `workflow_runs` (migration v6) | Governed ingest / generate / infer / query executions |
-| **Frontend shell** | `/d/[domainId]/[zone]` | Discover · Data · Knowledge · Workflows · Operations |
+| **Frontend shell** | `/d/[domainId]/[zone]` | Discover · Lake · Knowledge · Workflows · Operations |
 
-**Navigation:** `/` → workspace → `/d/{domain}/data`; `/domain/{id}?module=…` redirects to zone routes.
+**Navigation:** `/` → workspace → `/d/{domain}/data` (Lake zone); `/domain/{id}?module=…` redirects to zone routes.
 
-**Write path:** ingest and synthetic registration flow through `DataProductService` + `WorkflowRunRepository` + lineage graph; evaluations register `entity_versions`.
+**Write path:** ingest and synthetic registration populate warehouse tables, sync into `lake_assets` (research/development spaces), workflow runs, lineage, and version snapshots.
 
-### Data-centered foundation (shipped)
+### Domain lake foundation (shipped)
 
-- **`data_products`**, **knowledge_assets**, **saved_queries** (migration v5)
-- Catalog **v1.1** with `data_product_bindings` and resolved `data_product_ids`
-- Legacy domain modules remain during transition
+- **`lake_assets`**, **research_artifacts**, **development_artifacts** (migration v8)
+- Compatibility: `data_products` rows sync into lake assets (`legacy_product_id`)
+- **`knowledge_assets`**, **saved_queries** linked via lake asset / legacy product id
+- Catalog **v1.1** with domain manifests and recommended workflows
 
 ## Versioning architecture (foundation shipped — #28 open)
 
@@ -106,6 +114,8 @@ Goal: a stable hosted environment suitable for demo and internal pilot.
 
 See [deployment-plan.md](./deployment-plan.md) for the full checklist.
 
+Governance baseline: CI now includes backend Ruff + pytest and frontend lint + typecheck + build. Keep this roadmap aligned with `GOVERNANCE.md` and `docs/governance-framework.md` as gates evolve.
+
 ---
 
 ## Phase 2 — Production hardening
@@ -118,13 +128,15 @@ See [deployment-plan.md](./deployment-plan.md) for the full checklist.
 | **Config** | `production` vs `development` profiles documented |
 | **Security** | CORS, rate limits, password policy, JWT rotation story |
 
+Data governance baseline: `docs/data-governance.md` documents current storage zones, generated file policy, backup expectations, and retention gaps. Automated retention and broader audit coverage remain hardening work.
+
 ---
 
 ## Phase 3 — Research workspace depth
 
 | Theme | Outcomes |
 |-------|----------|
-| **Domains** | Deepen models per subdomain (physical, finance, supply chain, intelligence, computing) |
+| **Domains** | Deepen models per subdomain; Physical Systems: solvers registered, sweep analytics, surrogate predictors — [physical-systems.md](./physical-systems.md) |
 | **Inference** | Richer schemas, batch inference, uncertainty bands |
 | **Sweeps & compare** | Saved sweep templates, diff views across runs |
 | **Exports** | Scheduled reports, more export formats |
@@ -172,6 +184,6 @@ See [deployment-plan.md](./deployment-plan.md) for the full checklist.
 1. **Deployment + CI** — unlock shared demos and tomorrow’s go-live path
 2. **Security basics** — roles, secrets, audit before external users
 3. **Highest-value feature** — pick one platform module to make “real” (e.g. data upload or runnable MLOps)
-4. **Research depth** — per domain based on your use case (aerospace, finance, etc.)
+4. **Research depth** — per domain based on your use case (physics, finance, etc.)
 
 When starting work, open or pick an issue, move it on the project board, and link PRs with `Closes #N`.

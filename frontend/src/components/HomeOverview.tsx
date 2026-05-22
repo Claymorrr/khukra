@@ -15,6 +15,7 @@ import {
   Truck,
   Zap,
 } from "lucide-react";
+import { KhukraMark } from "@/components/brand/KhukraLogo";
 import type { CatalogResponse, RunResponse, Selection } from "@/lib/types";
 
 const DOMAIN_ICONS: Record<string, typeof Box> = {
@@ -49,6 +50,10 @@ export function HomeOverview({
   return (
     <div className="space-y-8">
       <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-transparent p-8 shadow-2xl shadow-black/30">
+        <KhukraMark
+          className="pointer-events-none absolute -bottom-12 -right-10 h-56 w-56 rotate-[-10deg] text-white/10"
+          accentColor={accentColor}
+        />
         <div
           className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full opacity-25 blur-3xl"
           style={{ backgroundColor: accentColor }}
@@ -59,17 +64,17 @@ export function HomeOverview({
               Khukra research command center
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-              Stochastic computational modeling, inference, and optimization-ready evidence.
+              Solver-backed science, inference, and analytics-ready evidence.
             </h2>
             <p className="mt-4 text-sm leading-7 text-zinc-400">
-              Generate synthetic scenarios from mathematical processes, forecast uncertainty, register artifacts,
-              inspect lineage, and prepare research decisions for optimization studies.
+              Run physics solvers and stochastic models, inspect traces and metrics, register artifacts,
+              inspect lineage, and prepare research decisions for optimization or surrogate studies.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Capability icon={<Network className="h-4 w-4" />} title="Stochastic DGPs" text="Jump diffusion, Hawkes, regime switching, queueing, and belief-state systems." />
-              <Capability icon={<Database className="h-4 w-4" />} title="Queryable lakehouse" text="DuckDB + Parquet persistence, contracts, profiling, synthetic IDs, and in-app SQL." />
-              <Capability icon={<GitBranch className="h-4 w-4" />} title="Traceable MLOps" text="Scenario → dataset → inference → artifact → evaluation lineage." />
-              <Capability icon={<ShieldCheck className="h-4 w-4" />} title="Research governance" text="Versioned model metadata, evaluations, exports, and reproducible seeds." />
+              <Capability icon={<Network className="h-4 w-4" />} title="Physics solvers" text="Mechanics, thermofluid, dynamics, traces, and scientific metrics." />
+              <Capability icon={<Database className="h-4 w-4" />} title="Queryable lakehouse" text="DuckDB + Parquet persistence, contracts, profiling, solver outputs, and in-app SQL." />
+              <Capability icon={<GitBranch className="h-4 w-4" />} title="Traceable evidence" text="Solver or scenario -> dataset -> inference -> artifact -> evaluation lineage." />
+              <Capability icon={<ShieldCheck className="h-4 w-4" />} title="Research governance" text="Versioned model metadata, evaluations, exports, and reproducible runs." />
             </div>
           </div>
           <div className="flex flex-col gap-3">
@@ -85,7 +90,7 @@ export function HomeOverview({
               ) : (
                 <Zap className="h-4 w-4" />
               )}
-              Run stochastic demo
+              Run physics demo
             </button>
             <p className="text-center text-xs text-zinc-600">
               {totalRuns} inferences in warehouse
@@ -197,11 +202,11 @@ export function HomeOverview({
         <ol className="mt-4 space-y-3 text-sm text-zinc-400">
           <li className="flex gap-3">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs text-white">1</span>
-            Click <strong className="text-zinc-200">Run demo inference</strong> above to generate outputs and traces instantly.
+            Click <strong className="text-zinc-200">Run physics demo</strong> above to generate solver outputs and traces instantly.
           </li>
           <li className="flex gap-3">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs text-white">2</span>
-            Open a domain card, tweak inputs, and press <strong className="text-zinc-200">Infer</strong>.
+            Open a domain card, tweak inputs, and press <strong className="text-zinc-200">Solve</strong> or <strong className="text-zinc-200">Infer</strong>.
           </li>
           <li className="flex gap-3">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs text-white">3</span>

@@ -3,28 +3,30 @@ from khukra.domains.computing.systems import (
     DistributedReliability,
     MLAcceleratorWorkloads,
 )
-from khukra.domains.finance.quantitative import (
-    AlphaSignalDecay,
-    DrawdownRiskEnvelope,
-    MarketMicrostructure,
-    RiskExecutionResearch,
-    StatisticalArbitrage,
+from khukra.domains.finance import (
+    AlphaDecaySignal,
+    DrawdownEnvelopeRisk,
+    ExecutionSlippageSim,
+    LiquidityRegimeForecast,
+    MarketScenarioResearch,
+    PaperOrderFillSim,
+    PaperTradingDeliveryGate,
+    PortfolioAllocationOptimizer,
+    PortfolioRiskEnvelope,
+    SharpeRatioBacktest,
+    SpreadSignalResearch,
+    StrategyBacktestValidation,
+    StrategyReleaseReadiness,
 )
 from khukra.domains.intelligence.research import (
     AdversarialIndications,
     InfluenceDynamics,
     SignalFusion,
 )
-from khukra.domains.physical.aerodesign import (
-    AerodesignMissionRange,
-    AerodesignPerformance,
-    AerodesignStaticMargin,
-)
-from khukra.domains.physical.propulsion import (
-    CombustionStability,
-    HybridPropulsionControl,
-    TurbomachineryDegradation,
-)
+from khukra.domains.physical.dynamics.point_mass import PointMass2D
+from khukra.domains.physical.mechanics.beam import CantileverBeam
+from khukra.domains.physical.mechanics.oscillator import DampedOscillator
+from khukra.domains.physical.thermofluid.heat_exchanger import CounterflowHeatExchanger
 from khukra.domains.supply_chain.resilience import (
     DisruptionIntelligence,
     QualityDrift,
@@ -33,15 +35,17 @@ from khukra.domains.supply_chain.resilience import (
 
 SUBDOMAIN_LABELS: dict[str, dict[str, str]] = {
     "physical": {
-        "aerodesign": "Aerodesign — aerodynamic performance, stability, and design tradeoffs",
-        "turbomachinery_degradation": "Turbomachinery degradation — compressor/turbine health forecasting",
-        "combustion_stability": "Combustion stability — instability, emissions, flame dynamics",
-        "hybrid_propulsion_control": "Hybrid propulsion — electric/thermal mission-state forecasting",
+        "mechanics": "Mechanics — static structures, beams, and vibration dynamics",
+        "thermofluid": "Thermofluid — heat transfer, effectiveness, and thermal transients",
+        "dynamics": "Dynamics — ODE state-space motion with forces and dissipation",
     },
     "finance": {
-        "market_microstructure": "Market microstructure — LOB dynamics, liquidity, short-horizon returns",
-        "statistical_arbitrage": "Statistical arbitrage — residual spreads, regime-aware signals",
-        "risk_and_execution_research": "Risk & execution research — slippage, participation, intraday stress",
+        "market_research": "Market research — scenarios, liquidity regimes, microstructure features",
+        "signal_research": "Signal research — alpha decay and statistical arbitrage signals",
+        "strategy_backtesting": "Strategy backtesting — Sharpe, hit rate, drawdown validation gates",
+        "execution_simulation": "Execution simulation — slippage, impact, and paper-order fills",
+        "portfolio_risk": "Portfolio risk — drawdown envelopes, VaR proxies, allocation optimization",
+        "strategy_delivery": "Strategy delivery — release readiness and paper-trading deployment gates",
     },
     "supply_chain": {
         "quality_drift": "Quality drift — defect rates, process capability, warranty risk",
@@ -62,32 +66,42 @@ SUBDOMAIN_LABELS: dict[str, dict[str, str]] = {
 
 DOMAINS: dict[str, dict[str, dict[str, type]]] = {
     "physical": {
-        "aerodesign": {
-            "aerodynamic_performance_forecast": AerodesignPerformance,
-            "static_margin_stability_forecast": AerodesignStaticMargin,
-            "mission_range_envelope_forecast": AerodesignMissionRange,
+        "mechanics": {
+            "cantilever_beam": CantileverBeam,
+            "damped_oscillator": DampedOscillator,
         },
-        "turbomachinery_degradation": {
-            "turbomachinery_health_forecast": TurbomachineryDegradation,
+        "thermofluid": {
+            "counterflow_heat_exchanger": CounterflowHeatExchanger,
         },
-        "combustion_stability": {
-            "combustion_instability_forecast": CombustionStability,
-        },
-        "hybrid_propulsion_control": {
-            "hybrid_propulsion_mission_forecast": HybridPropulsionControl,
+        "dynamics": {
+            "point_mass_2d": PointMass2D,
         },
     },
     "finance": {
-        "market_microstructure": {
-            "lob_liquidity_forecast": MarketMicrostructure,
+        "market_research": {
+            "market_scenario_research": MarketScenarioResearch,
+            "liquidity_regime_forecast": LiquidityRegimeForecast,
         },
-        "statistical_arbitrage": {
-            "spread_mean_reversion_forecast": StatisticalArbitrage,
-            "alpha_signal_decay_forecast": AlphaSignalDecay,
+        "signal_research": {
+            "spread_signal_research": SpreadSignalResearch,
+            "alpha_decay_signal": AlphaDecaySignal,
         },
-        "risk_and_execution_research": {
-            "execution_slippage_forecast": RiskExecutionResearch,
-            "drawdown_risk_envelope_forecast": DrawdownRiskEnvelope,
+        "strategy_backtesting": {
+            "strategy_backtest_validation": StrategyBacktestValidation,
+            "sharpe_ratio_backtest": SharpeRatioBacktest,
+        },
+        "execution_simulation": {
+            "execution_slippage_sim": ExecutionSlippageSim,
+            "paper_order_fill_sim": PaperOrderFillSim,
+        },
+        "portfolio_risk": {
+            "drawdown_envelope_risk": DrawdownEnvelopeRisk,
+            "portfolio_risk_envelope": PortfolioRiskEnvelope,
+            "portfolio_allocation_optimizer": PortfolioAllocationOptimizer,
+        },
+        "strategy_delivery": {
+            "strategy_release_readiness": StrategyReleaseReadiness,
+            "paper_trading_delivery_gate": PaperTradingDeliveryGate,
         },
     },
     "supply_chain": {

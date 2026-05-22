@@ -10,13 +10,13 @@ import {
   LineChart,
   Loader2,
   LogOut,
-  Sparkles,
   Truck,
 } from "lucide-react";
 import { getCatalog } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { DomainInfo } from "@/lib/types";
 import { zonePath } from "@/lib/api/v1";
+import { KhukraLogo } from "@/components/brand/KhukraLogo";
 
 const DOMAIN_ICONS: Record<string, typeof Box> = {
   physical: Box,
@@ -24,6 +24,14 @@ const DOMAIN_ICONS: Record<string, typeof Box> = {
   supply_chain: Truck,
   intelligence: Brain,
   computing: Cpu,
+};
+
+const DOMAIN_BLURBS: Record<string, string> = {
+  physical: "Simulation cockpit: mechanics, thermofluid, dynamics solvers, sweeps, surrogate-ready outputs.",
+  finance: "Inference cockpit: scenarios, signals, backtests, execution simulation, risk, paper-trading gates.",
+  supply_chain: "Resilience simulations: quality drift, disruption risk, recovery policy workloads.",
+  intelligence: "Fusion inference: signal fusion, influence diffusion, warning simulations.",
+  computing: "Reliability simulation: latency, throughput, edge-degradation workloads.",
 };
 
 export function WorkspaceGate() {
@@ -50,15 +58,7 @@ export function WorkspaceGate() {
 
       <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col">
         <header className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
-              <Sparkles className="h-5 w-5 text-sky-300" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold tracking-wide">Khukra</p>
-              <p className="text-[11px] uppercase tracking-[0.24em] text-zinc-600">Data Product OS</p>
-            </div>
-          </div>
+          <KhukraLogo accentColor="#7dd3fc" subtitle="Inference & Simulation Cockpit" />
           <button
             type="button"
             onClick={logout}
@@ -71,14 +71,14 @@ export function WorkspaceGate() {
 
         <main className="flex flex-1 flex-col justify-center py-12">
           <section className="mb-10 max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.32em] text-zinc-600">Knowledge lakehouse</p>
+            <p className="text-xs uppercase tracking-[0.32em] text-zinc-600">Mission control</p>
             <h1 className="mt-4 text-5xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
-              Governed data products, domain views.
+              Interactive cockpit for inference and simulation.
             </h1>
             <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-zinc-600">
               {user && <span>{user.display_name}</span>}
               <span className="h-1 w-1 rounded-full bg-zinc-700" />
-              <span>Data Hub · Knowledge · Pipelines · Models</span>
+              <span>Develop · Validate · Package · Operate</span>
             </div>
           </section>
 
@@ -99,11 +99,13 @@ export function WorkspaceGate() {
               {domains.map((domain, index) => {
                 const Icon = DOMAIN_ICONS[domain.id] ?? Box;
                 const modelCount = domain.subdomains.reduce((n, s) => n + s.models.length, 0);
+                const domainTitle = domain.label.split(" — ")[0];
+                const domainDetail = `${domain.subdomains.length} workload families · ${modelCount} instruments`;
                 return (
                   <button
                     key={domain.id}
                     type="button"
-                    onClick={() => router.push(zonePath(domain.id, "data"))}
+                    onClick={() => router.push(zonePath(domain.id, "workflows"))}
                     className="group relative min-h-72 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 text-left shadow-2xl shadow-black/20 transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.06]"
                   >
                     <div
@@ -125,11 +127,11 @@ export function WorkspaceGate() {
                       </div>
 
                       <div>
-                        <h2 className="text-lg font-medium tracking-tight text-white">
-                          {domain.label.split(" — ")[0]}
-                        </h2>
-                        <p className="mt-2 text-xs text-zinc-600">
-                          {domain.subdomains.length} subdomains · {modelCount} models
+                        <h2 className="text-lg font-medium tracking-tight text-white">{domainTitle}</h2>
+                        <p className="mt-2 text-xs text-zinc-600">{domainDetail}</p>
+                        <p className="mt-3 text-xs leading-5 text-zinc-500">
+                          {DOMAIN_BLURBS[domain.id] ??
+                            "Inference and simulation workloads with validation and lifecycle ops."}
                         </p>
                         <div
                           className="mt-5 h-1 w-12 rounded-full transition-all group-hover:w-20"

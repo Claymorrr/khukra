@@ -1,0 +1,14 @@
+---
+description: Frontend conventions for the Khukra Next.js app
+globs: frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend
+
+- Follow the existing Next.js app router patterns under `frontend/src/app/`.
+- Keep domain workspace behavior aligned with `/d/{domainId}/...` routes.
+- Use typed props and existing UI/data-fetching patterns before adding new abstractions.
+- Do not depend on local generated API data committed to the repo.
+- Run `npm run lint`, `npm run typecheck`, and `npm run build` for frontend changes.
+- Document new environment variables in `README.md` and `.env.example`.

@@ -87,7 +87,9 @@ def health() -> dict:
 async def lifespan(_app: FastAPI):
     ensure_default_admin()
     ensure_domain_manifest_versions()
-    get_app_container().products.sync_legacy()
+    container = get_app_container()
+    container.products.sync_legacy()
+    container.lake.sync_domain_lake()
     yield
 
 

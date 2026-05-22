@@ -7,6 +7,7 @@ from typing import Any
 from khukra.data.repositories.contracts import ContractRepository
 from khukra.data.repositories.data_products import DataProductRepository
 from khukra.data.repositories.lineage import LineageRepository
+from khukra.data.repositories.lake_assets import LakeAssetRepository
 from khukra.data.repositories.product_versions import ProductVersionRepository
 from khukra.versioning.service import get_version_registry
 
@@ -21,10 +22,13 @@ class DataProductService:
         self.lineage = LineageRepository()
         self.contracts = ContractRepository()
         self.snapshots = ProductVersionRepository()
+        self.lake = LakeAssetRepository()
         self.registry = get_version_registry()
 
     def sync_all(self) -> int:
-        return self.products.sync_from_warehouse()
+        count = self.products.sync_from_warehouse()
+        self.lake.sync_from_data_products()
+        return count
 
     def register_uploaded(
         self,
@@ -72,6 +76,8 @@ class DataProductService:
             promotion_state="validated" if quality == "passed" else "draft",
         )
         self.registry.register("uploaded_dataset", dataset_id, "1.0.0", metadata={"product_id": product_id})
+        self.lake.sync_from_product_row(self.products.get(product_id) or {})
+        self.lineage.record_edge("uploaded_dataset", dataset_id, "lake_asset", product_id, "materializes")
         return product_id
 
     def register_synthetic(
@@ -145,6 +151,10 @@ class DataProductService:
             promotion_state="validated" if quality == "passed" else "draft",
             metadata={"scenario_id": scenario_id},
         )
+        row = self.products.get(product_id)
+        if row:
+            self.lake.sync_from_product_row(row)
+            self.lineage.record_edge("synthetic_dataset", dataset_id, "lake_asset", product_id, "materializes")
         return product_id
 
     def resolve_domain_product_ids(self, domain_id: str, family_ids: list[str]) -> list[str]:

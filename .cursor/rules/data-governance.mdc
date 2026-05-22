@@ -1,0 +1,14 @@
+---
+description: Data governance rules for lake, lineage, synthetic, and versioning code
+globs: src/khukra/{data,application,synthetic,versioning}/**/*.py
+alwaysApply: false
+---
+
+# Data Governance
+
+- Store runtime outputs under `KHUKRA_DATA_ROOT`; do not write generated files outside governed zones.
+- Preserve DuckDB catalog and Parquet/JSON file consistency when adding writes or deletes.
+- Record lineage and version metadata for data-producing workflows where existing services support it.
+- Treat model artifacts as governed metadata unless real binary artifact storage is explicitly designed.
+- Add audit/workflow records for user-triggered actions that change shared state, or document the gap.
+- Update `docs/data-governance.md` when adding storage zones, retention behavior, or lifecycle semantics.

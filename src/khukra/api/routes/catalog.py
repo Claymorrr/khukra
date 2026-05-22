@@ -54,14 +54,39 @@ def get_catalog() -> CatalogResponse:
             models: list[ModelInfo] = []
             for model_id in list_models(domain_id, subdomain_id):
                 model = get_model(domain_id, subdomain_id, model_id)
+                model_meta: dict[str, str] = {}
+                solver_spec: dict[str, Any] = {}
+                param_rows: list[ParameterSchema] = []
+                if domain_id == "physical":
+                    from khukra.domains.physical.models_registry import (
+                        catalog_parameters_for,
+                        get_solver_spec,
+                        inference_meta_for,
+                        model_kind,
+                    )
+
+                    inference_meta = inference_meta_for(model_id)
+                    spec = get_solver_spec(model_id)
+                    model_meta = {
+                        "model_kind": model_kind(model_id),
+                        "predictor_type": str(inference_meta.get("type", "")),
+                    }
+                    solver_spec = spec.to_metadata()["solver_spec"] if spec else {}
+                    physical_params = catalog_parameters_for(model_id, _infer_type)
+                    if physical_params:
+                        param_rows = [ParameterSchema(**row) for row in physical_params]
+                if not param_rows:
+                    param_rows = [
+                        ParameterSchema(**enrich_parameter(k, _infer_type(v), v, _format_label(k)))
+                        for k, v in model.default_parameters().items()
+                    ]
                 models.append(
                     ModelInfo(
                         id=model_id,
                         label=_format_label(model_id),
-                        parameters=[
-                            ParameterSchema(**enrich_parameter(k, _infer_type(v), v, _format_label(k)))
-                            for k, v in model.default_parameters().items()
-                        ],
+                        parameters=param_rows,
+                        solver_spec=solver_spec,
+                        **model_meta,
                     )
                 )
             subdomains.append(
@@ -94,11 +119,15 @@ def get_catalog() -> CatalogResponse:
         latest_manifest = registry.get_latest("domain_manifest", domain_id)
         if latest_manifest:
             manifest_raw["version"] = latest_manifest["version_label"]
+        # Older running API processes may have domain metadata without the compact
+        # label/color fields. Keep catalog tolerant so the landing page never 500s.
+        label = str(meta.get("label") or meta.get("name") or _format_label(domain_id))
+        color = str(meta.get("color") or "#38bdf8")
         domains.append(
             DomainInfo(
                 id=domain_id,
-                label=meta["label"],
-                color=meta["color"],
+                label=label,
+                color=color,
                 manifest=DomainManifestInfo(**manifest_raw),
                 subdomains=subdomains,
             )

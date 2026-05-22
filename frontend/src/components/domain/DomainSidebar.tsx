@@ -23,7 +23,9 @@ export function DomainSidebar({ domain, selection, onSelect }: DomainSidebarProp
           </div>
           <div>
             <h1 className="text-sm font-semibold tracking-wide text-white">{domain.label}</h1>
-            <p className="text-xs text-zinc-500">Subdomains & models</p>
+            <p className="text-xs text-zinc-500">
+              {domain.id === "physical" ? "Subdomains & solvers" : "Subdomains & models"}
+            </p>
           </div>
         </div>
       </div>
@@ -79,7 +81,12 @@ export function DomainSidebar({ domain, selection, onSelect }: DomainSidebarProp
                         selection.modelId === model.id ? { color: domain.color } : undefined
                       }
                     >
-                      {model.label}
+                      <span className="block truncate">{model.label}</span>
+                      {domain.id === "physical" && model.model_kind && (
+                        <span className="mt-0.5 block text-[10px] font-normal uppercase tracking-wide text-zinc-600">
+                          {model.model_kind.replace(/_/g, " ")}
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>

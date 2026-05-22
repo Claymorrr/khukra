@@ -21,7 +21,7 @@ def test_platform_manifest_modules():
     domain_ids = {d["id"] for d in manifest["domains"]}
     assert "physical" in domain_ids
     physical = next(d for d in manifest["domains"] if d["id"] == "physical")
-    assert "Aerospace" in physical["label"] or "Physical" in physical["label"]
+    assert "Physical" in physical["label"] or "Physics" in physical["label"]
 
 
 def test_pipeline_templates():
@@ -36,14 +36,17 @@ def test_parameter_enrichment():
     assert p["description"]
 
 
-def test_physical_aerodesign_registered():
+def test_physical_mechanics_registered():
+    from khukra.domains.physical.models_registry import model_kind
     from khukra.domains.registry import get_model, list_models, list_subdomains
 
-    assert "aerodesign" in list_subdomains("physical")
-    assert "aerodynamic_performance_forecast" in list_models("physical", "aerodesign")
-    model = get_model("physical", "aerodesign", "aerodynamic_performance_forecast")
+    assert "mechanics" in list_subdomains("physical")
+    assert "cantilever_beam" in list_models("physical", "mechanics")
+    model = get_model("physical", "mechanics", "cantilever_beam")
     assert model.domain == "physical"
-    assert model.subdomain == "aerodesign"
+    assert model.subdomain == "mechanics"
+    assert model_kind("cantilever_beam") == "solver"
+    assert model_kind("damped_oscillator") == "dynamic_simulation"
 
 
 def test_catalog_exposes_domain_manifest():
@@ -53,18 +56,19 @@ def test_catalog_exposes_domain_manifest():
     physical = next(d for d in resp.domains if d.id == "physical")
     finance = next(d for d in resp.domains if d.id == "finance")
 
-    assert "Aerodesign" in physical.label
-    assert "aerodesign" in physical.manifest.tagline.lower()
+    assert "Physics" in physical.label or "Physical" in physical.label
+    assert "solver" in physical.manifest.tagline.lower() or "physics" in physical.manifest.tagline.lower()
     assert "MLOps" in physical.manifest.ops_capabilities
     assert "InfraOps" in physical.manifest.ops_capabilities
     assert "DevOps" in physical.manifest.ops_capabilities
     assert "data_generation" in physical.manifest.module_order
     assert "infraops" in physical.manifest.module_order
     assert "devops" in physical.manifest.module_order
-    assert "Quant Trading" in finance.label
+    assert "Automated Trading" in finance.label or "Trading" in finance.label
     assert "InfraOps" in finance.manifest.ops_capabilities
     assert "DevOps" in finance.manifest.ops_capabilities
-    assert "Alpha" in " ".join(finance.manifest.primary_focus)
+    assert "backtest" in " ".join(finance.manifest.primary_focus).lower()
+    assert "paper" in finance.manifest.tagline.lower() or "paper" in finance.manifest.positioning.lower()
 
 
 def test_ops_summary_for_domain():
@@ -88,5 +92,13 @@ def test_catalog_enriched_parameters():
     resp = get_catalog()
     params = resp.domains[0].subdomains[0].models[0].parameters
     seed = next((x for x in params if x.name == "seed"), None)
+    # Physical solvers may not expose seed; pick first domain with seed if needed
+    if seed is None:
+        for domain in resp.domains:
+            for sub in domain.subdomains:
+                for model in sub.models:
+                    seed = next((x for x in model.parameters if x.name == "seed"), None)
+                    if seed:
+                        break
     assert seed is not None
     assert seed.description

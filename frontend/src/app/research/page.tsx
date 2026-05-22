@@ -3,13 +3,18 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { domainPath } from "@/components/domain/types";
+import { zonePath } from "@/lib/api/v1";
 
 export default function ResearchRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(domainPath("physical", "inference"));
+    router.replace(
+      zonePath("physical", "workflows", {
+        subdomain: "mechanics",
+        model: "cantilever_beam",
+      })
+    );
   }, [router]);
 
   return (

@@ -1,0 +1,25 @@
+# Default owner
+* @Claymorrr
+
+# Backend and platform
+/src/khukra/api/ @Claymorrr
+/src/khukra/application/ @Claymorrr
+/src/khukra/data/ @Claymorrr
+/src/khukra/inference/ @Claymorrr
+/src/khukra/services/ @Claymorrr
+
+# Domains
+/src/khukra/domains/ @Claymorrr
+/config/plugins.json @Claymorrr
+
+# Frontend
+/frontend/ @Claymorrr
+
+# Governance, docs, CI
+/.github/ @Claymorrr
+/.cursor/rules/ @Claymorrr
+/docs/ @Claymorrr
+/GOVERNANCE.md @Claymorrr
+/CONTRIBUTING.md @Claymorrr
+/SECURITY.md @Claymorrr
+/CHANGELOG.md @Claymorrr

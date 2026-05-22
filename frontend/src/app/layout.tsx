@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Khukra — Inference & Data Engineering",
   description: "Multi-domain inference platform with a data warehouse",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

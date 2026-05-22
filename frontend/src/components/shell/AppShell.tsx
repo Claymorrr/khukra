@@ -9,14 +9,12 @@ import {
   Brain,
   Cpu,
   Database,
-  GitBranch,
   Home,
   Layers,
   LineChart,
   Loader2,
   LogOut,
   Play,
-  Sparkles,
   Truck,
   Wrench,
 } from "lucide-react";
@@ -24,15 +22,15 @@ import { getCatalog } from "@/lib/api";
 import { zonePath, type AppZone } from "@/lib/api/v1";
 import { useAuth } from "@/lib/auth";
 import type { CatalogResponse, DomainInfo } from "@/lib/types";
-import { DataHub } from "../platform/DataHub";
+import { DomainLakePanel } from "../platform/DomainLakePanel";
 import { DataOpsPanel } from "../platform/DataOpsPanel";
 import { KnowledgePanel } from "../platform/KnowledgePanel";
-import { DataGenerationStudio } from "../platform/DataGenerationStudio";
-import { AnalyticsWorkbench } from "../platform/AnalyticsWorkbench";
 import { DevOpsPanel, InfraOpsPanel } from "../platform/OpsReadinessPanel";
-import { PlatformMLOpsPanel } from "../platform/PlatformMLOpsPanel";
 import { DomainOverview } from "../domain/DomainOverview";
+import { DomainAssistant } from "../assistant/DomainAssistant";
+import { DomainCockpit } from "../cockpit/DomainCockpit";
 import { normalizeDomainManifest } from "@/lib/domainManifest";
+import { KhukraLogo } from "@/components/brand/KhukraLogo";
 
 const DOMAIN_ICONS: Record<string, typeof Box> = {
   physical: Box,
@@ -44,9 +42,9 @@ const DOMAIN_ICONS: Record<string, typeof Box> = {
 
 const ZONES: Array<{ id: AppZone; label: string; icon: typeof Layers }> = [
   { id: "discover", label: "Discover", icon: Layers },
-  { id: "data", label: "Data", icon: Database },
+  { id: "data", label: "Data plane", icon: Database },
   { id: "knowledge", label: "Knowledge", icon: BookOpen },
-  { id: "workflows", label: "Workflows", icon: Play },
+  { id: "workflows", label: "Cockpit", icon: Play },
   { id: "operations", label: "Operations", icon: Wrench },
 ];
 
@@ -55,9 +53,19 @@ interface AppShellProps {
   zone: AppZone;
   productId?: string;
   children?: ReactNode;
+  /** Deep-link solver context for physical workbench */
+  workflowSubdomain?: string;
+  workflowModel?: string;
 }
 
-export function AppShell({ domainId, zone, productId, children }: AppShellProps) {
+export function AppShell({
+  domainId,
+  zone,
+  productId,
+  children,
+  workflowSubdomain,
+  workflowModel,
+}: AppShellProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -74,6 +82,10 @@ export function AppShell({ domainId, zone, productId, children }: AppShellProps)
   const domain = catalog?.domains.find((d) => d.id === domainId);
   const accent = domain?.color ?? "#38bdf8";
   const manifest = normalizeDomainManifest(domainId, domain?.manifest);
+  const displayLabel = domain?.label ?? domainId;
+  const displayTagline =
+    manifest.tagline ||
+    "Develop → validate → package → operate inference and simulation workloads.";
 
   const setZone = useCallback(
     (z: AppZone) => {
@@ -94,11 +106,7 @@ export function AppShell({ domainId, zone, productId, children }: AppShellProps)
     <div className="flex h-screen overflow-hidden bg-[#07090d] text-white">
       <aside className="flex w-52 shrink-0 flex-col border-r border-white/10 bg-black/50">
         <div className="border-b border-white/10 px-4 py-4">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.24em] text-zinc-500">
-            <Sparkles className="h-4 w-4" style={{ color: accent }} />
-            Khukra
-          </p>
-          <p className="mt-1 text-[10px] text-zinc-600">Data Product OS</p>
+          <KhukraLogo accentColor={accent} subtitle="Inference & Simulation Cockpit" />
           <button
             type="button"
             onClick={() => router.push("/")}
@@ -117,7 +125,7 @@ export function AppShell({ domainId, zone, productId, children }: AppShellProps)
               <button
                 key={d.id}
                 type="button"
-                onClick={() => router.push(zonePath(d.id, "data"))}
+                onClick={() => router.push(zonePath(d.id, "workflows"))}
                 className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs transition ${
                   active ? "bg-white/10 text-white" : "text-zinc-500 hover:bg-white/5"
                 }`}
@@ -166,9 +174,9 @@ export function AppShell({ domainId, zone, productId, children }: AppShellProps)
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="shrink-0 border-b border-white/10 px-6 py-4">
           <p className="text-xs uppercase tracking-[0.28em] text-zinc-600">
-            {domain?.label ?? domainId}
+            {displayLabel}
           </p>
-          <h1 className="mt-1 text-2xl font-semibold">{manifest.tagline || "Domain view"}</h1>
+          <h1 className="mt-1 text-2xl font-semibold">{displayTagline}</h1>
           {productId && (
             <p className="mt-1 font-mono text-xs text-zinc-500">Product: {productId}</p>
           )}
@@ -181,10 +189,18 @@ export function AppShell({ domainId, zone, productId, children }: AppShellProps)
               domain={domain}
               accentColor={accent}
               productId={productId}
+              workflowSubdomain={workflowSubdomain}
+              workflowModel={workflowModel}
             />
           )}
         </div>
       </main>
+      <DomainAssistant
+        domain={domain}
+        domainId={domainId}
+        zone={zone}
+        accentColor={accent}
+      />
     </div>
   );
 }
@@ -195,12 +211,16 @@ function ZoneContent({
   domain,
   accentColor,
   productId,
+  workflowSubdomain,
+  workflowModel,
 }: {
   zone: AppZone;
   domainId: string;
   domain?: DomainInfo;
   accentColor: string;
   productId?: string;
+  workflowSubdomain?: string;
+  workflowModel?: string;
 }) {
   if (zone === "discover" && domain) {
     return (
@@ -214,6 +234,8 @@ function ZoneContent({
             data: "data",
             knowledge: "knowledge",
             inference: "workflows",
+            results: "workflows",
+            sweeps: "workflows",
             data_generation: "data",
             mlops: "workflows",
             infraops: "operations",
@@ -228,7 +250,41 @@ function ZoneContent({
   if (zone === "data") {
     return (
       <div className="space-y-8">
-        <DataHub domainId={domainId} accentColor={accentColor} />
+        {domainId === "physical" && (
+          <section
+            className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"
+            style={{ borderColor: `${accentColor}33` }}
+          >
+            <p className="text-xs uppercase tracking-[0.28em] text-zinc-600">Domain data plane</p>
+            <h2 className="mt-2 text-2xl font-semibold text-white">
+              Traces, artifacts, sweeps, and validation evidence from workload runs.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500">
+              Supporting layer for inference and simulation execution — persisted outputs,
+              lineage, and knowledge assets behind the cockpit.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {["mechanics", "thermofluid", "dynamics", "solver outputs", "surrogate datasets"].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-zinc-400"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = zonePath(domainId, "workflows");
+              }}
+              className="mt-5 rounded-xl border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5"
+            >
+              Open cockpit
+            </button>
+          </section>
+        )}
+        <DomainLakePanel domainId={domainId} accentColor={accentColor} />
         <DataOpsPanel domainId={domainId} accentColor={accentColor} />
       </div>
     );
@@ -236,17 +292,14 @@ function ZoneContent({
   if (zone === "knowledge") {
     return <KnowledgePanel domainId={domainId} accentColor={accentColor} />;
   }
-  if (zone === "workflows") {
+  if (zone === "workflows" && domain) {
     return (
-      <div className="space-y-6">
-        <p className="text-sm text-zinc-500">
-          Model-centric inference, sweeps, and analytics. Full parameter UI uses the legacy workflow shell below.
-        </p>
-        <LegacyWorkflowEmbed domainId={domainId} />
-        <DataGenerationStudio accentColor={accentColor} domainId={domainId} />
-        <AnalyticsWorkbench accentColor={accentColor} domainId={domainId} />
-        <PlatformMLOpsPanel accentColor={accentColor} domainId={domainId} />
-      </div>
+      <DomainCockpit
+        domain={domain}
+        accentColor={accentColor}
+        initialSubdomain={workflowSubdomain}
+        initialModel={workflowModel}
+      />
     );
   }
   if (zone === "operations") {
@@ -258,24 +311,4 @@ function ZoneContent({
     );
   }
   return <p className="text-sm text-zinc-500">Select a zone.</p>;
-}
-
-/** Embeds domain shell inference path without full chrome duplication */
-function LegacyWorkflowEmbed({ domainId }: { domainId: string }) {
-  const router = useRouter();
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-      <p className="mb-3 flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-600">
-        <GitBranch className="h-4 w-4" />
-        Inference workspace
-      </p>
-      <button
-        type="button"
-        onClick={() => router.push(`/domain/${domainId}?module=inference`)}
-        className="rounded-xl border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5"
-      >
-        Open full inference shell (legacy route)
-      </button>
-    </div>
-  );
 }

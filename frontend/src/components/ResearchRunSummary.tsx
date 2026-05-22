@@ -13,6 +13,9 @@ export function ResearchRunSummary({ result, accentColor }: ResearchRunSummaryPr
   const bestMetric = Object.entries(result.metrics).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))[0];
   const datasetId = result.metadata?.synthetic_dataset_id;
   const scenarioId = result.metadata?.scenario_id;
+  const solverSpec = result.metadata?.solver_spec as { title?: string; model_kind?: string } | undefined;
+  const numericalStatus = result.metadata?.numerical_status as { integration_success?: boolean; n_steps?: number } | undefined;
+  const isSolverRun = Boolean(solverSpec);
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-6 shadow-glow">
@@ -24,21 +27,37 @@ export function ResearchRunSummary({ result, accentColor }: ResearchRunSummaryPr
         <div>
           <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-zinc-500">
             <Sparkles className="h-4 w-4" style={{ color: accentColor }} />
-            Inference dossier
+            {isSolverRun ? "Solver dossier" : "Inference dossier"}
           </p>
           <h3 className="mt-3 text-2xl font-semibold tracking-tight text-white">
-            {result.model_name.replace(/_/g, " ")}
+            {solverSpec?.title ?? result.model_name.replace(/_/g, " ")}
           </h3>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-400">
             {result.explanation ||
-              "Forecast inference completed with synthetic scenario generation and persisted prediction evidence."}
+              (isSolverRun
+                ? "Physics solver completed with scientific metrics, simulation traces, and solver metadata."
+                : "Forecast inference completed with synthetic scenario generation and persisted prediction evidence.")}
           </p>
 
           <div className="mt-5 flex flex-wrap gap-2">
             <Badge icon={<Activity className="h-3.5 w-3.5" />} label={result.predictor_type?.replace(/_/g, " ") ?? "stochastic predictor"} />
             <Badge icon={<Clock3 className="h-3.5 w-3.5" />} label={`${result.latency_ms ?? 0} ms`} />
-            <Badge icon={<Database className="h-3.5 w-3.5" />} label={datasetId != null ? String(datasetId) : "dataset pending"} />
-            <Badge icon={<GitBranch className="h-3.5 w-3.5" />} label={scenarioId != null ? String(scenarioId) : "scenario pending"} />
+            <Badge
+              icon={<Database className="h-3.5 w-3.5" />}
+              label={
+                isSolverRun
+                  ? `${numericalStatus?.n_steps ?? "n/a"} solver steps`
+                  : datasetId != null ? String(datasetId) : "dataset pending"
+              }
+            />
+            <Badge
+              icon={<GitBranch className="h-3.5 w-3.5" />}
+              label={
+                isSolverRun
+                  ? numericalStatus?.integration_success === false ? "integration failed" : "integration ok"
+                  : scenarioId != null ? String(scenarioId) : "scenario pending"
+              }
+            />
           </div>
         </div>
 

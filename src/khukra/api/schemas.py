@@ -20,6 +20,9 @@ class ModelInfo(BaseModel):
     id: str
     label: str
     parameters: list[ParameterSchema]
+    model_kind: str = ""
+    predictor_type: str = ""
+    solver_spec: dict[str, Any] = Field(default_factory=dict)
 
 
 class SubdomainInfo(BaseModel):
@@ -83,6 +86,70 @@ class DataProductDetail(DataProductInfo):
     preview: dict[str, Any] | None = None
     knowledge_assets: list["KnowledgeAssetInfo"] = Field(default_factory=list)
     saved_queries: list["SavedQueryInfo"] = Field(default_factory=list)
+
+
+class LakeAssetInfo(BaseModel):
+    lake_asset_id: str
+    name: str
+    lake_space: str
+    asset_kind: str
+    domain: str
+    source_type: str
+    source_id: str
+    legacy_product_id: str | None = None
+    storage_uri: str | None = None
+    row_count: int | None = None
+    column_schema: dict[str, Any] = Field(default_factory=dict)
+    contract_id: str | None = None
+    version_label: str = "1.0.0"
+    quality_status: str = "unknown"
+    lineage_status: str = "partial"
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: str | None = None
+    updated_at: str | None = None
+
+
+class LakeAssetListResponse(BaseModel):
+    domain: str
+    lake_space: str | None = None
+    assets: list[LakeAssetInfo]
+    total: int
+
+
+class LakeArtifactInfo(BaseModel):
+    artifact_id: str
+    lake_asset_id: str | None = None
+    domain: str
+    artifact_type: str
+    title: str
+    content: dict[str, Any] = Field(default_factory=dict)
+    version_label: str = "1.0.0"
+    created_at: str | None = None
+
+
+class LakeArtifactCreate(BaseModel):
+    artifact_type: str
+    title: str
+    content: dict[str, Any] = Field(default_factory=dict)
+    lake_asset_id: str | None = None
+
+
+class DomainLakeSummary(BaseModel):
+    domain: str
+    research_lake: dict[str, Any]
+    product_development_lake: dict[str, Any]
+    totals: dict[str, int]
+
+
+class DomainLakeDetail(LakeAssetInfo):
+    versions: list[dict[str, Any]] = Field(default_factory=list)
+    lineage_edges: list[dict[str, Any]] = Field(default_factory=list)
+    profile: dict[str, Any] | None = None
+    preview: dict[str, Any] | None = None
+    knowledge_assets: list["KnowledgeAssetInfo"] = Field(default_factory=list)
+    saved_queries: list["SavedQueryInfo"] = Field(default_factory=list)
+    research_artifacts: list[LakeArtifactInfo] = Field(default_factory=list)
+    development_artifacts: list[LakeArtifactInfo] = Field(default_factory=list)
 
 
 class KnowledgeAssetInfo(BaseModel):

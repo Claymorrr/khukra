@@ -23,7 +23,12 @@ export function ParameterForm({
           className="group block rounded-2xl border border-white/10 bg-black/20 p-4 transition hover:border-white/20 hover:bg-white/[0.035]"
         >
           <span className="mb-1.5 flex items-center justify-between gap-3 text-xs font-medium text-zinc-400">
-            <span>{param.label}</span>
+            <span>
+              {param.label}
+              {"unit" in param && param.unit ? (
+                <span className="ml-1.5 font-mono text-[10px] text-zinc-600">[{param.unit}]</span>
+              ) : null}
+            </span>
             <span className="rounded-full bg-white/5 px-2 py-0.5 font-mono text-[10px] uppercase text-zinc-600">
               {param.type}
             </span>
