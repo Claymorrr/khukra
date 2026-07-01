@@ -1,0 +1,113 @@
+{
+  "project_title": "Khukra Operations",
+  "owner": "Claymorrr",
+  "default_repo": "Claymorrr/khukra",
+  "status_field": "Status",
+  "status_options": ["Backlog", "Todo", "In Progress", "Done", "Won't do"],
+  "items": [
+    {
+      "id": "ops-001",
+      "title": "[Khukra] Stabilize local dev (skip startup sync, single DuckDB writer)",
+      "body": "API was crashing on catalog sync and DuckDB file locks. KHUKRA_SKIP_STARTUP_SYNC=1 added to start-dev.ps1. Monitor for recurring crashes.",
+      "repo": "Claymorrr/khukra",
+      "status": "Done",
+      "labels": ["ops", "khukra", "dev-env"]
+    },
+    {
+      "id": "ops-002",
+      "title": "[Khukra] Switch DAX market data from Stooq to Yahoo Finance",
+      "body": "Stooq returns HTML bot-check; refresh cached 0 symbols. Yahoo chart API works for .DE tickers.",
+      "repo": "Claymorrr/khukra",
+      "status": "Done",
+      "labels": ["ops", "khukra", "data"]
+    },
+    {
+      "id": "ops-003",
+      "title": "[Khukra] Full-universe refresh + 15y history cap",
+      "body": "Refresh all symbols button, KHUKRA_MAX_HISTORY_YEARS=15, longer refresh timeout.",
+      "repo": "Claymorrr/khukra",
+      "status": "Done",
+      "labels": ["ops", "khukra", "data"]
+    },
+    {
+      "id": "ops-004",
+      "title": "[Khukra] Add macro regime data feeds (FRED/ECB + VSTOXX)",
+      "body": "Suggested data source tier 1 for finance disruption/regime research. Free, high value for scenario labeling.",
+      "repo": "Claymorrr/khukra",
+      "status": "Backlog",
+      "labels": ["ops", "khukra", "data", "suggestion"]
+    },
+    {
+      "id": "ops-005",
+      "title": "[Khukra] Corporate actions for .DE backtests",
+      "body": "Dividends/splits needed for correct total-return validation on German names.",
+      "repo": "Claymorrr/khukra",
+      "status": "Backlog",
+      "labels": ["ops", "khukra", "data", "suggestion"]
+    },
+    {
+      "id": "ops-006",
+      "title": "[Khukra] Expand universe beyond DAX 32 (MDAX / Euro Stoxx)",
+      "body": "User asked about larger data swipe beyond current curated universe.",
+      "repo": "Claymorrr/khukra",
+      "status": "Backlog",
+      "labels": ["ops", "khukra", "data", "suggestion"]
+    },
+    {
+      "id": "ops-007",
+      "title": "[Logistics] Scaffold khukra-logistics repo",
+      "body": "Standalone repo with disruption/quality/resilience models, CLI, API, tests.",
+      "repo": "Claymorrr/khukra",
+      "status": "Done",
+      "labels": ["ops", "logistics", "foundation"]
+    },
+    {
+      "id": "ops-008",
+      "title": "[Logistics] Disruption ingest + statistical discovery pipeline",
+      "body": "FRED/Yahoo signals, refresh/discover/forecast CLI and API endpoints. Pearson/Spearman, regimes, lead-lag, composite risk.",
+      "repo": "Claymorrr/khukra",
+      "status": "Done",
+      "labels": ["ops", "logistics", "data", "statistics"]
+    },
+    {
+      "id": "ops-009",
+      "title": "[Logistics] Discovery cockpit UI",
+      "body": "Browser board for catalog, refresh, insights, and composite risk charts (like Khukra finance cockpit).",
+      "repo": "Claymorrr/khukra",
+      "status": "Done",
+      "labels": ["ops", "logistics", "ui", "suggestion"]
+    },
+    {
+      "id": "ops-010",
+      "title": "[Logistics] Add port congestion + geopolitical event feeds",
+      "body": "Next-tier disruption data sources for global risk analysis.",
+      "repo": "Claymorrr/khukra",
+      "status": "Backlog",
+      "labels": ["ops", "logistics", "data", "suggestion"]
+    },
+    {
+      "id": "ops-011",
+      "title": "[Logistics] Calibrate simulation model from discovered composite risk",
+      "body": "Bridge empirical panel to disruption_risk_forecast instead of pure synthetic paths.",
+      "repo": "Claymorrr/khukra",
+      "status": "Backlog",
+      "labels": ["ops", "logistics", "modeling", "suggestion"]
+    },
+    {
+      "id": "ops-012",
+      "title": "[Logistics] Push repo to GitHub + link Operations board",
+      "body": "Remote repo and GitHub Project for tracking outside chat.",
+      "repo": "Claymorrr/khukra",
+      "status": "In Progress",
+      "labels": ["ops", "logistics", "infra"]
+    },
+    {
+      "id": "ops-013",
+      "title": "[Ops] Maintain single Operations board (this manifest)",
+      "body": "All agent suggestions go to board.manifest.json and sync to GitHub Project. Chat is not the tracker.",
+      "repo": "Claymorrr/khukra",
+      "status": "In Progress",
+      "labels": ["ops", "process"]
+    }
+  ]
+}
