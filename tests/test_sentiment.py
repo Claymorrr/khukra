@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from khukra_logistics.disruption.news.enrich import enrich_headline_row
-from khukra_logistics.disruption.news.sentiment import score_sentiment
+from khukra.disruption.news.enrich import enrich_headline_row
+from khukra.disruption.news.sentiment import score_sentiment
 
 
 def test_negative_headline_scores_below_zero():

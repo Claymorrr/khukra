@@ -8,20 +8,20 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from khukra_logistics.disruption.bayesian import (
+from khukra.disruption.bayesian import (
     bayesian_correlation,
     bayesian_linear_forecast,
     bayesian_regime_prob,
     composite_posterior,
 )
-from khukra_logistics.disruption.forecasting import (
+from khukra.disruption.forecasting import (
     PRODUCTION_METHOD,
     forecast_horizon,
     score_methods_fast,
     select_best_method,
 )
-from khukra_logistics.disruption.hybrid_composite import COMPOSITE_SMOOTH_DAYS, SPARSE_SIGNALS, build_hybrid_composite
-from khukra_logistics.simulation.primitives import forecast_holt_linear
+from khukra.disruption.hybrid_composite import COMPOSITE_SMOOTH_DAYS, SPARSE_SIGNALS, build_hybrid_composite
+from khukra.simulation.primitives import forecast_holt_linear
 
 
 def _returns(series: pd.Series) -> pd.Series:
@@ -267,7 +267,7 @@ def _method_scores_for_forecast(y_fore: np.ndarray) -> tuple[str, dict[str, dict
     """Prefer today's cached daily evaluation; fall back to fast Holt/MR scoring."""
     from datetime import date
 
-    from khukra_logistics.disruption.evaluation import latest_evaluation
+    from khukra.disruption.evaluation import latest_evaluation
 
     cached = latest_evaluation()
     if cached and cached.get("evaluation_date") == date.today().isoformat():

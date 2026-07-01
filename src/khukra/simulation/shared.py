@@ -11,11 +11,12 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from khukra_logistics.simulation.primitives import forecast_holt_linear
+from khukra.simulation.primitives import forecast_holt_linear
 
 
 def data_root() -> Path:
-    return Path(os.environ.get("KHUKRA_LOGISTICS_DATA_ROOT", "data"))
+    root = os.environ.get("KHUKRA_DATA_ROOT") or os.environ.get("KHUKRA_LOGISTICS_DATA_ROOT", "data")
+    return Path(root)
 
 
 def merge_params(defaults: dict[str, Any], overrides: dict[str, Any] | None) -> dict[str, Any]:

@@ -9,10 +9,10 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 import pandas as pd
 import pytest
 
-from khukra_logistics.disruption.news.insights import discover_news_insights
-from khukra_logistics.disruption.news.judgment import judge_headline
-from khukra_logistics.disruption.news.keywords import score_headline
-from khukra_logistics.disruption.news.service import ingest_news_feeds
+from khukra.disruption.news.insights import discover_news_insights
+from khukra.disruption.news.judgment import judge_headline
+from khukra.disruption.news.keywords import score_headline
+from khukra.disruption.news.service import ingest_news_feeds
 
 
 def _sample_rss() -> bytes:
@@ -39,10 +39,10 @@ def test_judge_rejects_off_topic_before_ingest():
 
 
 def test_ingest_filters_irrelevant_headlines(tmp_path, monkeypatch):
-    monkeypatch.setenv("KHUKRA_LOGISTICS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("KHUKRA_DATA_ROOT", str(tmp_path))
 
     def fake_fetch(feed_id: str, url: str):
-        from khukra_logistics.disruption.adapters.rss import RssEntry
+        from khukra.disruption.adapters.rss import RssEntry
 
         return [
             RssEntry(
@@ -61,7 +61,7 @@ def test_ingest_filters_irrelevant_headlines(tmp_path, monkeypatch):
             ),
         ]
 
-    monkeypatch.setattr("khukra_logistics.disruption.news.service.fetch_feed", fake_fetch)
+    monkeypatch.setattr("khukra.disruption.news.service.fetch_feed", fake_fetch)
     result = ingest_news_feeds()
     assert result["entries_new"] == 6
     assert result["entries_rejected"] == 6
@@ -69,10 +69,10 @@ def test_ingest_filters_irrelevant_headlines(tmp_path, monkeypatch):
 
 
 def test_ingest_news_with_mocked_feeds(tmp_path, monkeypatch):
-    monkeypatch.setenv("KHUKRA_LOGISTICS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("KHUKRA_DATA_ROOT", str(tmp_path))
 
     def fake_fetch(feed_id: str, url: str):
-        from khukra_logistics.disruption.adapters.rss import RssEntry
+        from khukra.disruption.adapters.rss import RssEntry
 
         return [
             RssEntry(
@@ -84,13 +84,13 @@ def test_ingest_news_with_mocked_feeds(tmp_path, monkeypatch):
             )
         ]
 
-    monkeypatch.setattr("khukra_logistics.disruption.news.service.fetch_feed", fake_fetch)
+    monkeypatch.setattr("khukra.disruption.news.service.fetch_feed", fake_fetch)
     result = ingest_news_feeds()
     json.dumps(result)
     assert result["entries_new"] >= 1
     assert result["stress_days"] >= 1
 
-    from khukra_logistics.disruption.cache import load_signal
+    from khukra.disruption.cache import load_signal
 
     series = load_signal("news_stress")
     assert series is not None

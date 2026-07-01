@@ -56,7 +56,7 @@ export function ProductionModelChart({ refreshKey = 0 }: { refreshKey?: number }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to load production model";
       if (msg.includes("not found") || msg.includes("404")) {
-        setError("Production model API not loaded — restart with .\\scripts\\start-dev.ps1");
+        setError("Production model API not loaded — restart with .\\scripts\\setup.ps1 -Dev");
       } else {
         setError(msg);
       }

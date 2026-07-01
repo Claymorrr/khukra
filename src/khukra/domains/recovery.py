@@ -6,9 +6,9 @@ from typing import Any
 
 import numpy as np
 
-from khukra_logistics.core.model import Model, ModelResult
-from khukra_logistics.simulation.primitives import ar_process, compound_poisson_shocks, shock_process
-from khukra_logistics.simulation.shared import (
+from khukra.core.model import Model, ModelResult
+from khukra.simulation.primitives import ar_process, compound_poisson_shocks, shock_process
+from khukra.simulation.shared import (
     holdout_forecast_metrics,
     merge_params,
     persist_scenario_series,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from khukra_logistics.disruption.bayesian import (
+from khukra.disruption.bayesian import (
     bayesian_correlation,
     bayesian_linear_forecast,
     bayesian_model_compare_nested,

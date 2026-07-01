@@ -1,7 +1,7 @@
 .PHONY: setup setup-seed dev test smoke typecheck help
 
 help:
-	@echo "Khukra Logistics"
+	@echo "Khukra"
 	@echo "  make setup       - venv + pip + npm install"
 	@echo "  make setup-seed  - setup + ingest 5y demo data"
 	@echo "  make dev         - start API + UI (use scripts on Windows)"
@@ -15,8 +15,8 @@ setup:
 	cd frontend && npm install
 
 setup-seed: setup
-	.venv/bin/khukra-logistics refresh --years 5 || .venv/Scripts/khukra-logistics.exe refresh --years 5
-	.venv/bin/khukra-logistics refresh-news || .venv/Scripts/khukra-logistics.exe refresh-news
+	.venv/bin/khukra refresh --years 5 || .venv/Scripts/khukra.exe refresh --years 5
+	.venv/bin/khukra refresh-news || .venv/Scripts/khukra.exe refresh-news
 
 test:
 	.venv/bin/python -m pytest tests/ -q || .venv/Scripts/python.exe -m pytest tests/ -q
@@ -28,5 +28,5 @@ typecheck:
 	cd frontend && npm run typecheck
 
 dev:
-	@echo "Windows: .\\scripts\\start-dev.ps1"
+	@echo "Windows: .\\scripts\\setup.ps1 -Dev"
 	@echo "Mac/Linux: ./scripts/start-dev.sh"

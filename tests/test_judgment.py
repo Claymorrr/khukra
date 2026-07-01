@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from khukra_logistics.disruption.news.judgment import judge_headline
+from khukra.disruption.news.judgment import judge_headline
 
 
 def test_judge_retains_logistics_headline():

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from khukra_logistics.disruption.news.sentiment import score_sentiment
+from khukra.disruption.news.sentiment import score_sentiment
 
 
 def enrich_headline_row(row: dict[str, Any]) -> dict[str, Any]:

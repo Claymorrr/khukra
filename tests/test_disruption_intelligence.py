@@ -8,9 +8,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from khukra_logistics.disruption.cache import load_panel, save_signal
-from khukra_logistics.disruption.service import DisruptionIntelligenceService
-from khukra_logistics.disruption.statistics import (
+from khukra.disruption.cache import load_panel, save_signal
+from khukra.disruption.service import DisruptionIntelligenceService
+from khukra.disruption.statistics import (
     composite_risk_index,
     discover_insights,
     forecast_composite,
@@ -27,12 +27,12 @@ def _synthetic_signal(n: int, seed: int, drift: float = 0.0) -> pd.DataFrame:
 
 @pytest.fixture
 def service(tmp_path, monkeypatch):
-    monkeypatch.setenv("KHUKRA_LOGISTICS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("KHUKRA_DATA_ROOT", str(tmp_path))
     return DisruptionIntelligenceService()
 
 
 def test_load_panel_merges_tz_aware_and_naive_dates(tmp_path, monkeypatch):
-    monkeypatch.setenv("KHUKRA_LOGISTICS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("KHUKRA_DATA_ROOT", str(tmp_path))
     save_signal(
         "vix",
         pd.DataFrame(
@@ -93,8 +93,8 @@ def test_discover_api_json_serializable(service, monkeypatch):
     def fake_fred(series_id, start=None, end=None):
         return _synthetic_signal(200, seed=1)
 
-    monkeypatch.setattr("khukra_logistics.disruption.service.fred.fetch_daily_series", fake_fred)
-    monkeypatch.setattr("khukra_logistics.disruption.service.yahoo.fetch_daily_series", fake_fred)
+    monkeypatch.setattr("khukra.disruption.service.fred.fetch_daily_series", fake_fred)
+    monkeypatch.setattr("khukra.disruption.service.yahoo.fetch_daily_series", fake_fred)
     service.refresh(["vix", "oil_wti"], years=2)
     import json
 
@@ -119,7 +119,7 @@ def test_panel_data_returns_series(service, tmp_path):
 
 
 def test_explore_falls_back_to_full_panel_when_only_news_selected(service, tmp_path, monkeypatch):
-    monkeypatch.setenv("KHUKRA_LOGISTICS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("KHUKRA_DATA_ROOT", str(tmp_path))
     for i, sid in enumerate(["vix", "oil_wti", "hy_oas"]):
         save_signal(sid, _synthetic_signal(200, seed=i))
     save_signal(
@@ -144,18 +144,18 @@ def test_refresh_with_mocked_adapters(service, monkeypatch):
         return _synthetic_signal(100, seed=2)
 
     monkeypatch.setattr(
-        "khukra_logistics.disruption.service.fred.fetch_daily_series",
+        "khukra.disruption.service.fred.fetch_daily_series",
         fake_fred,
     )
     monkeypatch.setattr(
-        "khukra_logistics.disruption.service.yahoo.fetch_daily_series",
+        "khukra.disruption.service.yahoo.fetch_daily_series",
         fake_yahoo,
     )
     def fake_basket(start=None, end=None):
         return _synthetic_signal(100, seed=3)
 
     monkeypatch.setattr(
-        "khukra_logistics.disruption.service.yahoo.fetch_shipping_basket",
+        "khukra.disruption.service.yahoo.fetch_shipping_basket",
         fake_basket,
     )
     result = service.refresh(["vix", "shipping_basket"], years=2)

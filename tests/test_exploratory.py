@@ -8,8 +8,8 @@ from datetime import date
 import numpy as np
 import pandas as pd
 
-from khukra_logistics.disruption.cache import load_panel, save_signal
-from khukra_logistics.disruption.exploratory import (
+from khukra.disruption.cache import load_panel, save_signal
+from khukra.disruption.exploratory import (
     changepoint_detection,
     correlation_matrices,
     pca_exploration,
@@ -47,7 +47,7 @@ def test_pca_exploration():
 
 
 def test_run_advanced_exploration_json_safe(tmp_path, monkeypatch):
-    monkeypatch.setenv("KHUKRA_LOGISTICS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("KHUKRA_DATA_ROOT", str(tmp_path))
     panel = _synthetic_panel(200)
     for col in ["vix", "oil_wti", "hy_oas"]:
         save_signal(col, panel[["date", col]].rename(columns={col: "value"}))

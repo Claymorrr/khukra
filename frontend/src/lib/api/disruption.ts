@@ -34,7 +34,7 @@ async function apiFetch<T>(path: string, init?: RequestInit, timeoutMs = 120_000
     }
     if (res.status === 404) {
       throw new Error(
-        `API endpoint not found (${path}). Restart with .\\scripts\\start-dev.ps1 to load the latest API.`,
+        `API endpoint not found (${path}). Restart with .\\scripts\\setup.ps1 -Dev to load the latest API.`,
       );
     }
     throw new Error(formatError(parsed, `Request failed: ${res.status}`));
@@ -127,11 +127,37 @@ export interface ForecastResult {
 export interface EvaluationWalkForward {
   methods: Record<
     string,
-    { walk_forward_mae: number; walk_forward_rmse: number; direction_hit_rate: number }
+    { walk_forward_mae: number; direction_hit_rate: number; walk_forward_rmse?: number }
   >;
   best_method: string;
   beats_holt: boolean;
   beats_naive: boolean;
+  eval_window_days?: number;
+  trace?: {
+    method: string;
+    eval_window_days: number;
+    stride: number;
+    point_count: number;
+    series: Array<{
+      date: string;
+      actual: number;
+      predicted: number;
+      abs_error: number;
+      direction_correct: boolean | null;
+    }>;
+  };
+}
+
+export interface PrecisionBreakdown {
+  mae_component: number;
+  mae_weighted: number;
+  direction_hit_rate: number;
+  direction_weighted: number;
+  beat_holt_bonus: number;
+  mae_target_bonus: number;
+  raw_total: number;
+  mae_target: number;
+  mae_ceiling: number;
 }
 
 export interface EvaluationResult {
@@ -142,12 +168,21 @@ export interface EvaluationResult {
   verdict: "on_track" | "improving" | "needs_work";
   interpretation: string;
   walk_forward: EvaluationWalkForward;
+  precision_breakdown?: PrecisionBreakdown;
+  hybrid_composite?: {
+    mode?: string;
+    channel_weights?: Record<string, number>;
+    smooth_days?: number;
+    signals_per_channel?: Record<string, number>;
+  };
   hybrid: {
     channels: Record<string, { signal_ids: string[]; active_count: number }>;
     hybrid_mode: string;
+    channel_weights?: Record<string, number>;
     total_signals: number;
   };
   channel_ablation?: Record<string, number>;
+  mae_target?: number;
 }
 
 export interface EvaluationHistoryRow {
@@ -242,7 +277,7 @@ export function evaluatePrecision(body: {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-  });
+  }, REFRESH_TIMEOUT_MS);
 }
 
 export interface ProductionModelResult {
@@ -260,12 +295,55 @@ export interface ProductionModelResult {
   interpretation: string;
 }
 
-export function getProductionModel(horizonDays = 30) {
+export function getProductionModel(horizonDays = 7) {
   return apiFetch<ProductionModelResult>(
     `/disruption/production-model?horizon_days=${horizonDays}`,
     undefined,
     60_000,
   );
+}
+
+export interface IndexDecompositionSignal {
+  signal_id: string;
+  label: string;
+  channel: string;
+  raw_value: number;
+  rolling_mean_60: number;
+  rolling_std_60: number;
+  z_score: number;
+  weight_in_channel?: number;
+}
+
+export interface IndexDecomposition {
+  date: string;
+  parameters: {
+    rolling_window: number;
+    rolling_min_periods: number;
+    channel_weights: Record<string, number>;
+    smooth_days: number;
+  };
+  signals: IndexDecompositionSignal[];
+  channels: Record<
+    string,
+    {
+      inverse_variance_weights: Record<string, number>;
+      signal_ids: string[];
+      value: number | null;
+    }
+  >;
+  composite_raw: number;
+  composite_smoothed: number;
+  channel_contributions: Record<string, number>;
+  formulas: {
+    z_score: string;
+    channel: string;
+    composite: string;
+    smooth: string;
+  };
+}
+
+export function getIndexDecomposition() {
+  return apiFetch<IndexDecomposition>("/disruption/index-decomposition", undefined, 60_000);
 }
 
 export function getEvaluationHistory(days = 30) {

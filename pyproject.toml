@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "khukra-logistics"
+name = "khukra"
 version = "0.1.0"
-description = "Khukra Logistics — disruption, quality, and resilience simulation for supply networks"
+description = "Khukra — hybrid disruption forecast and statistical risk intelligence"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -26,7 +26,7 @@ dev = [
 ]
 
 [project.scripts]
-khukra-logistics = "khukra_logistics.cli:main"
+khukra = "khukra.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

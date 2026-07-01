@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -31,7 +31,8 @@ import {
 } from "@/lib/api/disruption";
 import { ChartDashboard } from "@/components/ChartDashboard";
 import { EvaluationScorecard } from "@/components/EvaluationScorecard";
-import { ProductionModelChart } from "@/components/ProductionModelChart";
+import { WeekAheadForecast } from "@/components/WeekAheadForecast";
+import { IndexMathVisual } from "@/components/IndexMathVisual";
 import { FeatureGuide } from "@/components/FeatureGuide";
 import { NewsPanel } from "@/components/NewsPanel";
 
@@ -54,6 +55,7 @@ export function DisruptionCockpit() {
   const [showInsights, setShowInsights] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
   const [evalRefreshKey, setEvalRefreshKey] = useState(0);
+  const weekForecastInit = useRef(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -109,7 +111,7 @@ export function DisruptionCockpit() {
     try {
       const result = await forecastRisk({
         signal_ids: selected.length ? selected : undefined,
-        horizon_days: 30,
+        horizon_days: 7,
       });
       setForecast(result);
       setEvalRefreshKey((k) => k + 1);
@@ -126,6 +128,13 @@ export function DisruptionCockpit() {
       setForecasting(false);
     }
   }, [discovery, selected]);
+
+  useEffect(() => {
+    if ((status?.covered_count ?? 0) > 0 && !weekForecastInit.current) {
+      weekForecastInit.current = true;
+      void runForecast();
+    }
+  }, [status?.covered_count, runForecast]);
 
   const refresh = useCallback(
     async (all = false) => {
@@ -178,8 +187,8 @@ export function DisruptionCockpit() {
         <div className="flex items-center gap-4">
           <Globe2 className="h-6 w-6 text-amber-400" />
           <div>
-            <h1 className="text-lg font-semibold text-white">Khukra Logistics</h1>
-            <p className="text-xs text-zinc-500">Disruption risk charts</p>
+            <h1 className="text-lg font-semibold text-white">Khukra</h1>
+            <p className="text-xs text-zinc-500">Disruption risk · 7-day outlook</p>
           </div>
         </div>
 
@@ -218,15 +227,18 @@ export function DisruptionCockpit() {
           />
           <ActionBtn
             icon={BarChart3}
-            label="Forecast"
+            label="Week forecast"
             loading={forecasting}
             onClick={() => void runForecast()}
           />
         </div>
       </header>
 
+      <WeekAheadForecast refreshKey={evalRefreshKey} />
+
+      <IndexMathVisual refreshKey={evalRefreshKey} />
+
       <EvaluationScorecard refreshKey={evalRefreshKey} />
-      <ProductionModelChart refreshKey={evalRefreshKey} />
 
       {error && (
         <div className="rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-2 text-sm text-red-300">

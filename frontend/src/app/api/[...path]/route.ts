@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 function apiBase(): string {
   return (
-    process.env.KHUKRA_LOGISTICS_API_URL ||
+    process.env.KHUKRA_API_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
     "http://127.0.0.1:8010"
   ).replace(/\/$/, "");
@@ -39,7 +39,7 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
     const msg = err instanceof Error ? err.message : "Proxy failed";
     return NextResponse.json(
       {
-        detail: `Cannot reach Khukra Logistics API. Run .\\scripts\\start-dev.ps1. (${msg})`,
+        detail: `Cannot reach Khukra API. Run .\\scripts\\setup.ps1 -Dev. (${msg})`,
       },
       { status: 502 },
     );

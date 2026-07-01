@@ -10,21 +10,22 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from khukra_logistics.disruption.adapters import fred, gscpi, yahoo
-from khukra_logistics.disruption.cache import load_panel, repair_signal_dates, save_signal, signal_path, signal_status
-from khukra_logistics.disruption.catalog import DISRUPTION_SIGNALS, get_signal, hybrid_channel, list_signals
-from khukra_logistics.disruption.evaluation import (
+from khukra.disruption.adapters import fred, gscpi, yahoo
+from khukra.disruption.cache import load_panel, repair_signal_dates, save_signal, signal_path, signal_status
+from khukra.disruption.catalog import DISRUPTION_SIGNALS, get_signal, hybrid_channel, list_signals
+from khukra.disruption.evaluation import (
     evaluate_forecast_precision,
     latest_evaluation,
     load_evaluation_history,
     save_daily_evaluation,
 )
-from khukra_logistics.disruption.exploratory import run_advanced_exploration
-from khukra_logistics.disruption.hybrid_composite import SPARSE_SIGNALS
-from khukra_logistics.disruption.news.cache import load_headlines
-from khukra_logistics.disruption.news.insights import discover_news_insights
-from khukra_logistics.disruption.news.service import ingest_news_feeds, news_status
-from khukra_logistics.disruption.statistics import (
+from khukra.disruption.exploratory import run_advanced_exploration
+from khukra.disruption.hybrid_composite import decompose_hybrid_index
+from khukra.disruption.hybrid_composite import SPARSE_SIGNALS
+from khukra.disruption.news.cache import load_headlines
+from khukra.disruption.news.insights import discover_news_insights
+from khukra.disruption.news.service import ingest_news_feeds, news_status
+from khukra.disruption.statistics import (
     composite_risk_index,
     discover_insights,
     forecast_composite,
@@ -240,6 +241,13 @@ class DisruptionIntelligenceService:
         if panel.empty:
             raise ValueError("No cached disruption data. Run refresh first.")
         return production_model_forecast(panel, horizon=horizon)
+
+    def index_decomposition(self, signal_ids: list[str] | None = None) -> dict[str, Any]:
+        """Mathematical breakdown of the hybrid index at the latest observation."""
+        panel = load_panel(signal_ids)
+        if panel.empty:
+            raise ValueError("No cached disruption data. Run refresh first.")
+        return decompose_hybrid_index(panel)
 
     def evaluate(
         self,

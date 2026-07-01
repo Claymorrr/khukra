@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from khukra_logistics.disruption.statistics import production_model_forecast
+from khukra.disruption.statistics import production_model_forecast
 
 
 def _synthetic_panel(n: int = 200) -> pd.DataFrame:

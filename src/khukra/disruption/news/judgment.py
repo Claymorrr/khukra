@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from khukra_logistics.disruption.news.keywords import score_headline
+from khukra.disruption.news.keywords import score_headline
 
 OBJECTIVE = "global logistics disruption forecast"
 

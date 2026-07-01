@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-07-01
 
-Single tracker for suggestions, decisions, and work across **Khukra Finance**, **Khukra Physics**, and **Khukra Logistics**.  
+Single tracker for suggestions, decisions, and work across **Khukra Finance**, **Khukra Physics**, and **Khukra**.  
 The chat is not the source of truth — **this file and the GitHub Project are**.
 
 | Resource | Location |
@@ -73,7 +73,7 @@ High-ROI order: **ops-015 → ops-016 → ops-017 → ops-018**, then Phase 3–
 | ops-001 | Stabilize local dev (startup sync, DuckDB locks) | khukra |
 | ops-002 | DAX data: Stooq → Yahoo Finance | khukra |
 | ops-003 | Full-universe refresh + 15y history | khukra |
-| ops-007 | Scaffold khukra-logistics repo | logistics |
+| ops-007 | Scaffold khukra repo | logistics |
 | ops-008 | Disruption ingest + statistical discovery | logistics |
 | ops-009 | Discovery cockpit UI | logistics |
 | ops-012 | Push repos to GitHub (finance, physics, logistics) | logistics |

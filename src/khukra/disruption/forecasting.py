@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import Any, Callable
 
 import numpy as np
+import pandas as pd
 
-from khukra_logistics.disruption.bayesian import bayesian_linear_forecast
-from khukra_logistics.simulation.primitives import forecast_holt_linear
+from khukra.disruption.bayesian import bayesian_linear_forecast
+from khukra.simulation.primitives import forecast_holt_linear
 
 PredictFn = Callable[[np.ndarray], float]
 
@@ -83,6 +84,58 @@ def walk_forward_mae(
     mae = float(np.mean(errors)) if errors else float("nan")
     dir_rate = float(direction_hits / direction_total) if direction_total else 0.0
     return mae, dir_rate
+
+
+def walk_forward_trace(
+    y: np.ndarray,
+    dates: pd.Series | np.ndarray,
+    method: str,
+    min_train: int = 60,
+    tail: int = EVAL_TAIL,
+    stride: int = EVAL_STRIDE,
+    max_points: int = 126,
+) -> dict[str, Any]:
+    """Return actual vs predicted points for walk-forward visualization."""
+    y = np.asarray(y, dtype=float)
+    dt = pd.to_datetime(dates)
+    if len(y) != len(dt):
+        raise ValueError("y and dates must have the same length")
+
+    if len(y) > tail:
+        offset = len(y) - tail
+        y = y[offset:]
+        dt = dt.iloc[offset:].reset_index(drop=True)
+        min_train = max(40, min_train - offset)
+
+    fn = PREDICTORS.get(method, predict_next_holt)
+    points: list[dict[str, Any]] = []
+    for t in range(min_train, len(y), max(1, stride)):
+        pred = float(fn(y[:t]))
+        actual = float(y[t])
+        dir_ok: bool | None = None
+        if t > min_train and abs(y[t] - y[t - 1]) > 1e-9:
+            dir_ok = bool(np.sign(actual - y[t - 1]) == np.sign(pred - y[t - 1]))
+        points.append(
+            {
+                "date": pd.Timestamp(dt.iloc[t]).strftime("%Y-%m-%d"),
+                "actual": round(actual, 4),
+                "predicted": round(pred, 4),
+                "abs_error": round(abs(actual - pred), 4),
+                "direction_correct": dir_ok,
+            }
+        )
+
+    if len(points) > max_points:
+        step = max(1, len(points) // max_points)
+        points = points[::step]
+
+    return {
+        "method": method,
+        "eval_window_days": tail,
+        "stride": stride,
+        "point_count": len(points),
+        "series": points,
+    }
 
 
 def score_methods(

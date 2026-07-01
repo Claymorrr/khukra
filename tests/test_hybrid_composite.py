@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from khukra_logistics.disruption.hybrid_composite import build_hybrid_composite
+from khukra.disruption.hybrid_composite import build_hybrid_composite
 
 
 def test_inverse_variance_favors_lower_noise_signal():

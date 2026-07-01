@@ -1,5 +1,5 @@
-from khukra_logistics.core.model import Model
-from khukra_logistics.domains import DisruptionIntelligence, QualityDrift, ResiliencePlanning
+from khukra.core.model import Model
+from khukra.domains import DisruptionIntelligence, QualityDrift, ResiliencePlanning
 
 MODELS: dict[str, type[Model]] = {
     "disruption_risk_forecast": DisruptionIntelligence,

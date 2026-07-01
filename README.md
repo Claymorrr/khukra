@@ -1,8 +1,8 @@
-# Khukra Logistics
+# Khukra
 
 **Global disruption forecast and statistical risk analysis** — ingest public macro/shipping/news signals, discover Bayesian insights, and explore composite disruption risk.
 
-Sibling product to [Khukra](https://github.com/Claymorrr/khukra) (finance quant R&D).
+Sibling product to [Khukra Finance](https://github.com/Claymorrr/khukra-finance) (quant trading R&D).
 
 ## Quick start (clone → run)
 
@@ -19,15 +19,15 @@ Network access is required for first data ingest (FRED, Yahoo, RSS).
 ### Windows (recommended)
 
 ```powershell
-git clone <your-repo-url> khukra-logistics
-cd khukra-logistics
+git clone <your-repo-url> khukra
+cd khukra
 
 # One-time: venv + dependencies (+ optional demo data)
 .\scripts\setup.ps1
 # Or with pre-cached signals: .\scripts\setup.ps1 -SeedData
 
 # Start API + cockpit UI (auto-seeds on first run if cache is empty)
-.\scripts\start-dev.ps1
+.\scripts\setup.ps1 -Dev
 ```
 
 - **Cockpit:** http://localhost:3020  
@@ -36,8 +36,8 @@ cd khukra-logistics
 ### Mac / Linux
 
 ```bash
-git clone <your-repo-url> khukra-logistics
-cd khukra-logistics
+git clone <your-repo-url> khukra
+cd khukra
 chmod +x scripts/*.sh
 
 ./scripts/setup.sh              # one-time
@@ -58,7 +58,7 @@ Or: `make test`
 
 | Path | Purpose |
 |------|---------|
-| `.venv/` | Python env + `khukra-logistics` CLI |
+| `.venv/` | Python env + `khukra` CLI |
 | `frontend/node_modules/` | Next.js deps |
 | `frontend/.env.local` | API URL (auto-written by start-dev) |
 | `data/disruption_cache/` | Cached FRED/Yahoo signal parquet |
@@ -71,8 +71,8 @@ Or: `make test`
 Copy `.env.example` to `.env` if you need custom ports:
 
 ```
-KHUKRA_LOGISTICS_API_PORT=8010
-KHUKRA_LOGISTICS_UI_PORT=3020
+KHUKRA_API_PORT=8010
+KHUKRA_UI_PORT=3020
 ```
 
 ## Primary workflow
@@ -84,10 +84,10 @@ catalog → refresh (hybrid ingest) → evaluate (daily precision) → forecast 
 
 | Step | CLI | UI |
 |------|-----|-----|
-| Ingest macro + news | `khukra-logistics refresh --years 10` | Refresh |
-| **Daily precision** | `khukra-logistics evaluate` | Forecast precision card |
-| Forecast | `khukra-logistics forecast --horizon 30` | Forecast |
-| Diagnose panel | `khukra-logistics discover` / `explore` | Discover / Explore |
+| Ingest macro + news | `khukra refresh --years 10` | Refresh |
+| **Daily precision** | `khukra evaluate` | Forecast precision card |
+| Forecast | `khukra forecast --horizon 30` | Forecast |
+| Diagnose panel | `khukra discover` / `explore` | Discover / Explore |
 
 ### Data sources
 
@@ -119,7 +119,7 @@ catalog → refresh (hybrid ingest) → evaluate (daily precision) → forecast 
 
 | Problem | Fix |
 |---------|-----|
-| `Connection failed` / 502 | API not running → `.\scripts\start-dev.ps1` |
+| `Connection failed` / 502 | API not running → `.\scripts\setup.ps1 -Dev` |
 | `/explore` 404 or 1 method | Stale API process → restart `start-dev` |
 | Empty charts | Click **Refresh**, wait ~1 min for FRED/Yahoo |
 | `datetime64` merge error | Restart API (runs `repair_signal_dates`) |
@@ -130,7 +130,7 @@ catalog → refresh (hybrid ingest) → evaluate (daily precision) → forecast 
 Synthetic stress scenarios: `disruption_risk_forecast`, `defect_rate_forecast`, `recovery_time_forecast`
 
 ```powershell
-khukra-logistics run disruption_risk_forecast
+khukra run disruption_risk_forecast
 ```
 
 See [`docs/vision.md`](docs/vision.md) for product direction.

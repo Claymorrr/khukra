@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from khukra_logistics.simulation.shared import data_root
+from khukra.simulation.shared import data_root
 
 
 def news_cache_dir() -> Path:

@@ -1,4 +1,4 @@
-"""Tests for Khukra Logistics models."""
+"""Tests for Khukra models."""
 
 from __future__ import annotations
 
@@ -8,12 +8,12 @@ from pathlib import Path
 
 import pytest
 
-from khukra_logistics.registry import MODELS, get_model, list_models
+from khukra.registry import MODELS, get_model, list_models
 
 
 @pytest.fixture
 def data_root(tmp_path, monkeypatch):
-    monkeypatch.setenv("KHUKRA_LOGISTICS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("KHUKRA_DATA_ROOT", str(tmp_path))
     return tmp_path
 
 
@@ -35,7 +35,7 @@ def test_models_run_and_persist(model_id: str, data_root: Path):
 
 
 def test_cli_list(capsys):
-    from khukra_logistics.cli import main
+    from khukra.cli import main
 
     assert main(["list"]) == 0
     out = capsys.readouterr().out
@@ -43,7 +43,7 @@ def test_cli_list(capsys):
 
 
 def test_cli_run_json(capsys, data_root: Path):
-    from khukra_logistics.cli import main
+    from khukra.cli import main
 
     assert main(["run", "recovery_time_forecast", "--param", "horizon_days=90"]) == 0
     payload = json.loads(capsys.readouterr().out)

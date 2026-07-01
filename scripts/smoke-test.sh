@@ -9,7 +9,7 @@ source .venv/bin/activate
 
 python -m pytest tests/ -q
 
-API_PORT="${KHUKRA_LOGISTICS_API_PORT:-8010}"
+API_PORT="${KHUKRA_API_PORT:-${KHUKRA_LOGISTICS_API_PORT:-8010}}"
 if curl -sf "http://127.0.0.1:${API_PORT}/api/health" >/dev/null; then
   echo "API health OK"
 else

@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from khukra_logistics.disruption.evaluation import (
+from khukra.disruption.evaluation import (
     evaluate_forecast_precision,
     save_daily_evaluation,
 )
-from khukra_logistics.disruption.forecasting import predict_next_holt, walk_forward_mae
+from khukra.disruption.forecasting import predict_next_holt, walk_forward_mae
 
 
 def _synthetic_panel(n: int = 200) -> pd.DataFrame:
@@ -51,10 +51,13 @@ def test_evaluate_forecast_precision_returns_scorecard():
         "mean_reversion",
     )
     assert "channel_ablation" in result
+    assert "precision_breakdown" in result
+    assert result["walk_forward"]["trace"]["point_count"] > 0
+    assert len(result["walk_forward"]["trace"]["series"]) > 0
 
 
 def test_save_daily_evaluation(tmp_path, monkeypatch):
-    from khukra_logistics.disruption import evaluation as ev
+    from khukra.disruption import evaluation as ev
 
     monkeypatch.setattr(ev, "evaluation_dir", lambda: tmp_path)
     panel = _synthetic_panel()

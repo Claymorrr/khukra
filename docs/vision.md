@@ -1,6 +1,6 @@
-# Khukra Logistics Vision
+# Khukra Vision
 
-Khukra Logistics is a **hybrid disruption forecast** platform.
+Khukra is a **hybrid disruption forecast** platform.
 
 ## North star
 
@@ -44,7 +44,7 @@ Walk-forward 1-step MAE on the composite, direction hit rate, channel ablation (
 
 Persisted under `data/disruption_cache/evaluation/evaluation_YYYY-MM-DD.json`.
 
-Runs automatically after **Refresh** and **Poll RSS**. CLI: `khukra-logistics evaluate`.
+Runs automatically after **Refresh** and **Poll RSS**. CLI: `khukra evaluate`.
 
 ### 3. Forecast
 
@@ -60,4 +60,4 @@ Synthetic disruption, quality, and resilience models for scenario stress when em
 
 ## Relationship to Khukra
 
-Separate repository from [Khukra](https://github.com/Claymorrr/khukra) (finance). Shared patterns: CLI, API, local cache, reproducible artifacts.
+Separate repository from [Khukra Finance](https://github.com/Claymorrr/khukra-finance). Shared patterns: CLI, API, local cache, reproducible artifacts.

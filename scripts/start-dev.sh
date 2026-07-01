@@ -5,15 +5,15 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-API_PORT="${KHUKRA_LOGISTICS_API_PORT:-8010}"
-UI_PORT="${KHUKRA_LOGISTICS_UI_PORT:-3020}"
-export KHUKRA_LOGISTICS_API_PORT="$API_PORT"
-export KHUKRA_LOGISTICS_API_URL="http://127.0.0.1:${API_PORT}"
-export NEXT_PUBLIC_API_URL="$KHUKRA_LOGISTICS_API_URL"
+API_PORT="${KHUKRA_API_PORT:-${KHUKRA_LOGISTICS_API_PORT:-8010}}"
+UI_PORT="${KHUKRA_UI_PORT:-${KHUKRA_LOGISTICS_UI_PORT:-3020}}"
+export KHUKRA_API_PORT="$API_PORT"
+export KHUKRA_API_URL="http://127.0.0.1:${API_PORT}"
+export NEXT_PUBLIC_API_URL="$KHUKRA_API_URL"
 export PYTHONPATH="$ROOT/src"
 
 cat > frontend/.env.local <<EOF
-KHUKRA_LOGISTICS_API_URL=${KHUKRA_LOGISTICS_API_URL}
+KHUKRA_API_URL=${KHUKRA_API_URL}
 NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 EOF
 
@@ -37,7 +37,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 echo "Starting API on :${API_PORT}..."
-python -m uvicorn khukra_logistics.api.main:app --host 127.0.0.1 --port "$API_PORT" &
+python -m uvicorn khukra.api.main:app --host 127.0.0.1 --port "$API_PORT" &
 API_PID=$!
 
 HEALTH_URL="http://127.0.0.1:${API_PORT}/api/health"
@@ -50,12 +50,12 @@ for _ in $(seq 1 45); do
 done
 
 # First-run seed if cache empty
-if command -v khukra-logistics >/dev/null; then
+if command -v khukra >/dev/null; then
   COVERED="$(curl -sf "http://127.0.0.1:${API_PORT}/api/disruption/status" | python -c "import sys,json; print(json.load(sys.stdin).get('covered_count',0))" 2>/dev/null || echo 0)"
   if [[ "$COVERED" == "0" ]]; then
     echo "First run — ingesting demo signals (5y)..."
-    khukra-logistics refresh --years 5 || true
-    khukra-logistics refresh-news || true
+    khukra refresh --years 5 || true
+    khukra refresh-news || true
   fi
 fi
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# First-time setup for Khukra Logistics (Mac/Linux)
+# First-time setup for Khukra (Mac/Linux)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -15,7 +15,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "Khukra Logistics setup"
+echo "Khukra setup"
 echo "======================"
 
 command -v python3 >/dev/null || { echo "python3 required"; exit 1; }
@@ -41,8 +41,8 @@ mkdir -p data
 
 if [[ "$SEED_DATA" -eq 1 ]]; then
   echo "Seeding disruption signal cache (${YEARS}y)..."
-  khukra-logistics refresh --years "$YEARS"
-  khukra-logistics refresh-news || true
+  khukra refresh --years "$YEARS"
+  khukra refresh-news || true
 fi
 
 echo ""

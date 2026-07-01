@@ -10,12 +10,12 @@ from typing import Any
 
 import pandas as pd
 
-from khukra_logistics.disruption.adapters.rss import fetch_feed
-from khukra_logistics.disruption.cache import normalize_signal_dates, save_signal
-from khukra_logistics.disruption.news.cache import load_headlines, save_headlines
-from khukra_logistics.disruption.news.enrich import enrich_headline_row
-from khukra_logistics.disruption.news.feeds import FEEDS_BY_ID, NEWS_FEEDS
-from khukra_logistics.disruption.news.judgment import OBJECTIVE, judge_headline
+from khukra.disruption.adapters.rss import fetch_feed
+from khukra.disruption.cache import normalize_signal_dates, save_signal
+from khukra.disruption.news.cache import load_headlines, save_headlines
+from khukra.disruption.news.enrich import enrich_headline_row
+from khukra.disruption.news.feeds import FEEDS_BY_ID, NEWS_FEEDS
+from khukra.disruption.news.judgment import OBJECTIVE, judge_headline
 
 STRESS_SIGNAL_ID = "news_stress"
 SENTIMENT_SIGNAL_ID = "news_sentiment"

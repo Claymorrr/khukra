@@ -1,4 +1,4 @@
-"""FastAPI surface for Khukra Logistics."""
+"""FastAPI surface for Khukra."""
 
 from __future__ import annotations
 
@@ -8,12 +8,12 @@ from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from khukra_logistics import __version__
-from khukra_logistics.disruption.service import get_disruption_service
-from khukra_logistics.registry import get_model, list_models
+from khukra import __version__
+from khukra.disruption.service import get_disruption_service
+from khukra.registry import get_model, list_models
 
 app = FastAPI(
-    title="Khukra Logistics API",
+    title="Khukra API",
     description="Global disruption forecast, data ingest, and statistical risk discovery",
     version=__version__,
 )
@@ -64,7 +64,7 @@ class PanelRequest(BaseModel):
 def health() -> dict[str, Any]:
     return {
         "status": "ok",
-        "platform": "khukra-logistics",
+        "platform": "khukra",
         "version": __version__,
         "capabilities": [
             "catalog",
@@ -73,6 +73,7 @@ def health() -> dict[str, Any]:
             "forecast",
             "evaluate",
             "production-model",
+            "index-decomposition",
             "panel",
             "explore",
             "news",
@@ -129,6 +130,14 @@ def disruption_discover(body: DiscoverRequest) -> dict[str, Any]:
 def disruption_forecast(body: ForecastRequest) -> dict[str, Any]:
     try:
         return get_disruption_service().forecast(body.signal_ids, body.horizon_days)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@disruption.get("/index-decomposition")
+def disruption_index_decomposition() -> dict[str, Any]:
+    try:
+        return get_disruption_service().index_decomposition()
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

@@ -8,6 +8,7 @@ import {
   type EvaluationResult,
   type EvaluationHistoryRow,
 } from "@/lib/api/disruption";
+import { PrecisionProcessVisual } from "@/components/PrecisionProcessVisual";
 
 const VERDICT_LABEL: Record<string, string> = {
   on_track: "On track",
@@ -52,7 +53,7 @@ export function EvaluationScorecard({ refreshKey = 0 }: { refreshKey?: number })
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to load evaluation";
       if (msg.includes("not found") || msg.includes("404")) {
-        setError("Evaluation API not loaded — restart with .\\scripts\\start-dev.ps1");
+        setError("Evaluation API not loaded — restart with .\\scripts\\setup.ps1 -Dev");
       } else {
         setError(msg);
       }
@@ -162,6 +163,8 @@ export function EvaluationScorecard({ refreshKey = 0 }: { refreshKey?: number })
       {latest?.interpretation && (
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{latest.interpretation}</p>
       )}
+
+      {latest && <PrecisionProcessVisual evaluation={latest} />}
     </section>
   );
 }

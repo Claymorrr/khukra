@@ -7,7 +7,7 @@ from io import StringIO
 
 import pandas as pd
 
-from khukra_logistics.disruption.adapters import gscpi
+from khukra.disruption.adapters import gscpi
 
 
 def test_fetch_monthly_series_parses_latest_vintage(monkeypatch):

@@ -9,7 +9,7 @@ from typing import Any
 
 import pandas as pd
 
-from khukra_logistics.simulation.shared import data_root
+from khukra.simulation.shared import data_root
 
 
 def normalize_signal_dates(dates: pd.Series) -> pd.Series:
@@ -99,7 +99,7 @@ def save_signal(signal_id: str, df: pd.DataFrame) -> Path:
 
 def repair_signal_dates() -> list[str]:
     """Re-normalize cached parquet dates (fixes tz-aware vs naive merge errors)."""
-    from khukra_logistics.disruption.catalog import list_signals
+    from khukra.disruption.catalog import list_signals
 
     repaired: list[str] = []
     for signal in list_signals():
@@ -123,7 +123,7 @@ def repair_signal_dates() -> list[str]:
 
 def load_panel(signal_ids: list[str] | None = None) -> pd.DataFrame:
     """Wide daily panel: date index, one column per cached signal."""
-    from khukra_logistics.disruption.catalog import list_signals
+    from khukra.disruption.catalog import list_signals
 
     ids = signal_ids or [s.signal_id for s in list_signals()]
     if not ids:

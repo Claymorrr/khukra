@@ -10,11 +10,11 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from khukra_logistics.disruption.bayesian import bayesian_linear_forecast
-from khukra_logistics.disruption.catalog import DISRUPTION_SIGNALS, get_signal, hybrid_channel
-from khukra_logistics.disruption.forecasting import PREDICTORS, select_best_method, walk_forward_mae
-from khukra_logistics.disruption.hybrid_composite import COMPOSITE_SMOOTH_DAYS, build_hybrid_composite
-from khukra_logistics.simulation.shared import data_root
+from khukra.disruption.bayesian import bayesian_linear_forecast
+from khukra.disruption.catalog import DISRUPTION_SIGNALS, get_signal, hybrid_channel
+from khukra.disruption.forecasting import PREDICTORS, select_best_method, walk_forward_mae, walk_forward_trace
+from khukra.disruption.hybrid_composite import COMPOSITE_SMOOTH_DAYS, build_hybrid_composite
+from khukra.simulation.shared import data_root
 
 MIN_TRAIN = 60
 MAE_TARGET = 0.38  # tightened after weighted composite + model selection
@@ -73,6 +73,24 @@ def _leave_channel_out_mae(panel: pd.DataFrame, y_full: np.ndarray) -> dict[str,
     return scores
 
 
+def _precision_breakdown(best_mae: float, holt_mae: float, direction_hit_rate: float) -> dict[str, float]:
+    mae_component = max(0.0, min(1.0, 1.0 - best_mae / 0.65))
+    beat_bonus = 0.12 if best_mae <= holt_mae + 0.005 else 0.0
+    target_bonus = 0.08 if best_mae <= MAE_TARGET else 0.0
+    raw = 0.50 * mae_component + 0.30 * direction_hit_rate + beat_bonus + target_bonus
+    return {
+        "mae_component": round(mae_component, 4),
+        "mae_weighted": round(0.50 * mae_component, 4),
+        "direction_hit_rate": round(direction_hit_rate, 4),
+        "direction_weighted": round(0.30 * direction_hit_rate, 4),
+        "beat_holt_bonus": beat_bonus,
+        "mae_target_bonus": target_bonus,
+        "raw_total": round(raw, 4),
+        "mae_target": MAE_TARGET,
+        "mae_ceiling": 0.65,
+    }
+
+
 def _precision_score(best_mae: float, holt_mae: float, direction_hit_rate: float) -> int:
     mae_component = max(0.0, min(1.0, 1.0 - best_mae / 0.65))
     beat_bonus = 0.12 if best_mae <= holt_mae + 0.005 else 0.0
@@ -96,16 +114,19 @@ def evaluate_forecast_precision(
     """Run daily precision measurement on the weighted hybrid composite."""
     smooth, hybrid_meta = build_hybrid_composite(panel, smooth_days=COMPOSITE_SMOOTH_DAYS)
     y = smooth.values
+    dates = panel.loc[smooth.index, "date"]
     if len(y) < MIN_TRAIN + 10:
         raise ValueError(f"Need at least {MIN_TRAIN + 10} composite observations for evaluation.")
 
     best_name, wf = select_best_method(y)
     best = wf[best_name]
     holt_mae = wf["holt"]["walk_forward_mae"]
+    trace = walk_forward_trace(y, dates, best_name)
 
     holdout = bayesian_linear_forecast(y, horizon=horizon_days)
     channel_mae = _leave_channel_out_mae(panel, y)
 
+    breakdown = _precision_breakdown(best["walk_forward_mae"], holt_mae, best["direction_hit_rate"])
     precision = _precision_score(best["walk_forward_mae"], holt_mae, best["direction_hit_rate"])
     verdict = _verdict(best["walk_forward_mae"], holt_mae, best["direction_hit_rate"])
 
@@ -122,7 +143,9 @@ def evaluate_forecast_precision(
             "beats_holt": bool(best["walk_forward_mae"] <= holt_mae + 0.005),
             "beats_naive": bool(best["walk_forward_mae"] < wf["naive"]["walk_forward_mae"]),
             "eval_window_days": 504,
+            "trace": trace,
         },
+        "precision_breakdown": breakdown,
         "holdout_horizon": {
             "mae": holdout["holdout_mae"],
             "rmse": holdout["holdout_rmse"],

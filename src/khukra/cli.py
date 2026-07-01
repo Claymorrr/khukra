@@ -1,4 +1,4 @@
-"""CLI for Khukra Logistics."""
+"""CLI for Khukra."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ import sys
 from dataclasses import asdict, is_dataclass
 from typing import Any
 
-from khukra_logistics.disruption.service import get_disruption_service
-from khukra_logistics.registry import get_model, list_models
+from khukra.disruption.service import get_disruption_service
+from khukra.registry import get_model, list_models
 
 
 def _serialize(obj: Any) -> Any:
@@ -131,7 +131,7 @@ def cmd_news_status(_: argparse.Namespace) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="khukra-logistics",
+        prog="khukra",
         description="Global disruption forecast and statistical risk discovery",
     )
     sub = parser.add_subparsers(dest="command", required=True)

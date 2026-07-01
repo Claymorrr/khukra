@@ -8,7 +8,7 @@ from typing import Any
 
 import pandas as pd
 
-from khukra_logistics.disruption.bayesian import bayesian_correlation
+from khukra.disruption.bayesian import bayesian_correlation
 
 SIGNAL_ID = "news_stress"
 SENTIMENT_SIGNAL_ID = "news_sentiment"
